@@ -63,6 +63,8 @@ public:
 };
 
 
+//总结起来：常规的类继承中是可以定义相同函数名的函数，多态就是在在父类中将在子类中将要重复定义的函数定义virtual类型后，在对子类进行隐式类型转换成父类
+//后仍然可以调用子类中相同名字的函数功能。
 
 
 void main()
@@ -79,14 +81,14 @@ void main()
 
 	//case2: 做了隐式类型转换后（将子类隐式转换成父类）
 	Father *pFather = &so; // 隐式类型转换
-	pFather->Face();       //未加virtual重写  调用的是隐式转换前的类中定义的功能  "Grandson's face"
-	pFather->Say();        //加virtual重写    调用的是隐式转换前的类中定义的功能  "Son's unique func"
+	pFather->Face();       //未加virtual重写  调用的是隐式转换后的类（即父类）中定义的功能  "Father's face"
+	pFather->Say();        //加virtual重写    调用的是隐式转换前的类（即子类）中定义的功能  "Son say hello"
 
 
 	//case2: 做了隐式类型转换后（将子类隐式转换成父类）
 	Father *pFather2 = &gr; // 隐式类型转换
-	pFather2->Face();       //未加virtual重写  调用的是隐式转换前的类中定义的功能  "Grandson's face"
-	pFather2->Say();        //加virtual重写    调用的是隐式转换前的类中定义的功能  "Grandson's unique func"
+	pFather2->Face();       //未加virtual重写  调用的是隐式转换前的类中定义的功能  "Father's face"
+	pFather2->Say();        //加virtual重写    调用的是隐式转换前的类中定义的功能  "Grandson say hello" 
 
 
 	system("pause");
