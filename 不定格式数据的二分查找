@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+
+
+void binary_search(unsigned int *buffer, unsigned int target_frame_num, long len)
+{
+	int start = 0;
+	int end = len - 1;
+
+	if(len == 1)  //如果只有一个group的情况
+	{
+		return;
+	}
+
+	//start end 记录的是第一个group 和最后一个group的起始地址
+
+	unsigned int start_num = 0;
+	unsigned int end_num = 99;
+	long gap = (end-start) / (end_num - start_num);
+	long mid_pos = (target_frame_num - start_num)*gap + start;
+
+	while (start>=end)						//start 和 end 开始一直指向group header
+	{
+		while ((buffer[mid_pos] != 0xA) && (mid_pos >=len))
+		{
+			mid_pos++;
+		}
+		if (mid_pos >=len)
+		{
+			return;
+		}
+
+		if (buffer[mid_pos + 1] == target_frame_num)
+		{
+			return;     //搜索成功
+		}
+
+		if (buffer[mid_pos + 1] > target_frame_num)
+		{
+			if (buffer[mid_pos + 1] == end_num)      //特殊情况处理，当每次二分之后向后巡第一个group都是同一个的话，mid_pos的位置需要向左移动
+			{
+				end--;
+			}
+			else
+			{
+				end_num = buffer[mid_pos + 1];
+				end = mid_pos;
+			}
+			gap = (end - start) / (end_num - start_num);
+			mid_pos = (target_frame_num - start_num)*gap + start;
+		}
+
+		if ((buffer[mid_pos + 1] < target_frame_num))
+		{
+			start_num = buffer[mid_pos + 1];
+			start = mid_pos;
+			gap = (end - start) / (end_num - start_num);
+			mid_pos = (target_frame_num - start_num)*gap + start;
+		}
+	}
+	return;  //搜索失败
+
+}
+
+
+void main()
+{
+	_int8 *buffer = (char *)malloc(sizeof(_int8)*1000);
+	printf("%d", sizeof(buffer));
+	system("pause");
+	//FILE *fp=NULL;
+	//fopen("my_pass.txt", fp, 'r');
+	//fseek(fp, 0, SEEK_END); //定位到文件末 
+	//int nFileLen = 0;
+	//nFileLen = ftell(fp); //文件长度
+	//scanf("%d", &nFileLen);
+}
