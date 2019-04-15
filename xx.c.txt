@@ -1,13 +1,13 @@
 /***************************************************************************************************
-* °æÈ¨ĞÅÏ¢£ºCopyright (c) 2015, º¼Öİº£¿µÍşÊÓÊı×Ö¼¼Êõ¹É·İÓĞÏŞ¹«Ë¾
+* ç‰ˆæƒä¿¡æ¯ï¼šCopyright (c) 2015, æ­å·æµ·åº·å¨è§†æ•°å­—æŠ€æœ¯è‚¡ä»½æœ‰é™å…¬å¸
 *
-* ÎÄ¼şÃû³Æ£ºhka_check_image.c
-* Õª    Òª£º¼ì²éÊäÈë¡¢Êä³öÍ¼Ïñ²ÎÊıÊÇ·ñÕıÈ·£¬Ò»°ãÔÚËã·¨¿âÄÚÊ¹ÓÃ
+* æ–‡ä»¶åç§°ï¼šhka_check_image.c
+* æ‘˜    è¦ï¼šæ£€æŸ¥è¾“å…¥ã€è¾“å‡ºå›¾åƒå‚æ•°æ˜¯å¦æ­£ç¡®ï¼Œä¸€èˆ¬åœ¨ç®—æ³•åº“å†…ä½¿ç”¨
 *
-* µ±Ç°°æ±¾£º0.5.0
-* ×÷    Õß£ºÎäÏşÑô
-* ÈÕ    ÆÚ£º2015Äê05ÔÂ20ÈÕ
-* ±¸    ×¢£º´´½¨²¢Íê³É²İ¸å
+* å½“å‰ç‰ˆæœ¬ï¼š0.5.0
+* ä½œ    è€…ï¼šæ­¦æ™“é˜³
+* æ—¥    æœŸï¼š2015å¹´05æœˆ20æ—¥
+* å¤‡    æ³¨ï¼šåˆ›å»ºå¹¶å®Œæˆè‰ç¨¿
 ***************************************************************************************************/
 #include "hka_ffg.h"
 #define FILE_HEADER_SIZE sizeof(HIKVISION_MEDIA_FILE_HEADER)   //40
@@ -15,8 +15,8 @@
 #define BLOCK_HEADER_SIZE sizeof(BLOCK_HEADER)				   //20
 
 
-//º¯Êı·µ»Ø×´Ì¬ÀàĞÍ
-//Ëã·¨¿â¿ÉÒÔÔÚ¿âÍ·ÎÄ¼şÖĞ×Ô¶¨Òå×´Ì¬ÀàĞÍ£¬×Ô¶¨Òå×´Ì¬ÀàĞÍÖµ < -1000¡£
+//å‡½æ•°è¿”å›çŠ¶æ€ç±»å‹
+//ç®—æ³•åº“å¯ä»¥åœ¨åº“å¤´æ–‡ä»¶ä¸­è‡ªå®šä¹‰çŠ¶æ€ç±»å‹ï¼Œè‡ªå®šä¹‰çŠ¶æ€ç±»å‹å€¼ < -1000ã€‚
 typedef enum _HKAFFG_SEARCH_CODE
 {
 	HKAFFG_SEARCH_LEFT = 0x1000,
@@ -33,12 +33,12 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 		exit(1);
 
 	fseek(fp, 0, SEEK_END);
-	unsigned int file_size = ftell(fp);                                       //file_sizeÊµ¼ÊÔÚÊ¹ÓÃµÄÊ±ºòÓ¦¸Ã¼õÈ¥4, ±ÜÃâ³öÏÖgroupµÄstart_codeÔÚ×îºóÒ»¸ö×Ö½Ú³öÏÖ,µ«ÊÇframe_numÈ´²»´æÔÚ,ÍêÕûµÄËµÓ¦¸Ã¼õÈ¥48,Èç¹ûgroup²»ÍêÕû,ÄÇ¾ÍÊÇ²»´æÔÚ
+	unsigned int file_size = ftell(fp);                                       //file_sizeå®é™…åœ¨ä½¿ç”¨çš„æ—¶å€™åº”è¯¥å‡å»4, é¿å…å‡ºç°groupçš„start_codeåœ¨æœ€åä¸€ä¸ªå­—èŠ‚å‡ºç°,ä½†æ˜¯frame_numå´ä¸å­˜åœ¨,å®Œæ•´çš„è¯´åº”è¯¥å‡å»48,å¦‚æœgroupä¸å®Œæ•´,é‚£å°±æ˜¯ä¸å­˜åœ¨
 	fseek(fp, 0, SEEK_SET);
 	//15ms
 
 
-	unsigned int slice_size = SLICE_SIZE;  //¸ù¾İL1 cache 32KBµÄ´óĞ¡ÉèÖÃ
+	unsigned int slice_size = SLICE_SIZE;  //æ ¹æ®L1 cache 32KBçš„å¤§å°è®¾ç½®
 	unsigned int slice_num = (file_size + slice_size - 1) / slice_size;
 
 	unsigned int start_slice = 0;
@@ -63,7 +63,7 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 		status = HKAFFG_Process_Byte_Slice(buffer, target_frame_num, file_size, &target_pos);
 		if (status == HKA_STS_OK)
 		{
-			fseek(fp, target_pos, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			fseek(fp, target_pos, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 			fread(res, sizeof(GROUP_HEADER), 1, fp);
 			return status;
 		}
@@ -72,7 +72,7 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 	}
 	//531ms
 
-	//ËÑË÷Ô­Ê¼ÎÄ¼şµÄÆğÊ¼Ö¡ºÅ
+	//æœç´¢åŸå§‹æ–‡ä»¶çš„èµ·å§‹å¸§å·
 	for (int i = 0; i < slice_num; i++)
 	{
 		int slice_start = 0;
@@ -80,10 +80,10 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 		{
 			slice_start = slice_size*i - 3;
 		}
-		fseek(fp, slice_start, SEEK_SET);                 //Èç¹ûÊôÓÚÊÓÆµ¿ªÍ·Æ¬¶ÎµÄ»°,´Ó0¿ªÊ¼ÇĞÆ¬¶Î
+		fseek(fp, slice_start, SEEK_SET);                 //å¦‚æœå±äºè§†é¢‘å¼€å¤´ç‰‡æ®µçš„è¯,ä»0å¼€å§‹åˆ‡ç‰‡æ®µ
 
 
-		//µ±ÇĞ¸îµ½×îºóÒ»¸ösliceÊ±,×îºóÒ»¸ösliceÖĞµÄÊı¾İ¿ÉÄÜĞ¡ÓÚslice_sizeµÄÌØÊâ´¦Àí, ±ÜÃâËÑË÷µÄÊ±ºò³öÏÖÔ½½ç
+		//å½“åˆ‡å‰²åˆ°æœ€åä¸€ä¸ªsliceæ—¶,æœ€åä¸€ä¸ªsliceä¸­çš„æ•°æ®å¯èƒ½å°äºslice_sizeçš„ç‰¹æ®Šå¤„ç†, é¿å…æœç´¢çš„æ—¶å€™å‡ºç°è¶Šç•Œ
 		if ((file_size - slice_start - 3) < slice_size)
 		{
 			slice_size = file_size - slice_size*i;
@@ -101,11 +101,11 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 			break;
 		}
 	}
-	//Èç¹ûÃ»ÓĞËÑË÷µ½ÆğÊ¼Ö¡ºÅ,ËµÃ÷Ô­Ê¼ÎÄ¼şÖĞÃ»ÓĞÍêÕûÖ¡ĞÅÏ¢,½áÊøº¯Êı
+	//å¦‚æœæ²¡æœ‰æœç´¢åˆ°èµ·å§‹å¸§å·,è¯´æ˜åŸå§‹æ–‡ä»¶ä¸­æ²¡æœ‰å®Œæ•´å¸§ä¿¡æ¯,ç»“æŸå‡½æ•°
 	if (start_frame_num == -1)
 		return HKA_STS_ERR;
 	//546
-	//ËÑË÷Ô­Ê¼ÎÄ¼şµÄ½áÊøÖ¡ºÅ
+	//æœç´¢åŸå§‹æ–‡ä»¶çš„ç»“æŸå¸§å·
 	for (int i = 1; i <slice_num; i++)
 	{
 		int slice_start = slice_size*i + 3;
@@ -114,7 +114,7 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 			slice_size = slice_start - file_size;
 			slice_start = file_size;
 		}
-		fseek(fp, -slice_start, SEEK_END);               //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+		fseek(fp, -slice_start, SEEK_END);               //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 
 		fread(buffer, slice_size + 3, 1, fp);
 		status = HKAFFG_Searching_End_Group(buffer, slice_size + 3, &end_frame_pos);
@@ -127,7 +127,7 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 			break;
 		}
 	}
-	//Èç¹ûÃ»ÓĞËÑË÷µ½½áÊøÖ¡ºÅ,ËµÃ÷Ô­Ê¼ÎÄ¼şÖĞÃ»ÓĞÍêÕûÖ¡ĞÅÏ¢,½áÊøº¯Êı
+	//å¦‚æœæ²¡æœ‰æœç´¢åˆ°ç»“æŸå¸§å·,è¯´æ˜åŸå§‹æ–‡ä»¶ä¸­æ²¡æœ‰å®Œæ•´å¸§ä¿¡æ¯,ç»“æŸå‡½æ•°
 	if (end_frame_num == -1)
 		return HKA_STS_ERR;
 
@@ -138,49 +138,83 @@ HKA_STATUS HKAFFG_Process_Test_V3(FILE *fp, unsigned char *buffer, int target_fr
 		else
 			return HKA_STS_ERR;
 	}
+
+	/***********************************************************************************************************************/
+
+	/*slice_size = SLICE_SIZE;
+
+
+	unsigned int cur_frame_num;
+	unsigned int mid_pos;
+	mid_pos = (end_frame_pos - start_frame_pos)*(target_frame_num - start_frame_num) / (end_frame_num - start_frame_num) + start_frame_pos;
+	fseek(fp, mid_pos, SEEK_SET);
+	fread(buffer, slice_size, 1, fp);
+	status = HKAFFG_Process_Byte_Slice(b*/uffer, target_frame_num, slice_size, &cur_frame_num, &target_pos);
+
 	/**********************************************************************************************************************/
-	////¿ªÊ¼ÔÚ½øĞĞslice¼¶±ğµÄ¶ş·Ö²éÕÒ
+	////å¼€å§‹åœ¨è¿›è¡Œsliceçº§åˆ«çš„äºŒåˆ†æŸ¥æ‰¾
 	slice_size = SLICE_SIZE;
 	unsigned int slice_num_gap;
-	//unsigned int mid_slice;
-	
+
 	unsigned int cur_frame_num;
 	unsigned int mid_slice_pos;
+	HKA_STATUS status = HKA_STS_OK;
+	HKA_STATUS status1 = HKA_STS_OK;
 	mid_slice_pos = (end_frame_pos - start_frame_pos)*(target_frame_num - start_frame_num) / (end_frame_num - start_frame_num) + start_frame_pos;
 	while (1)
 	{
-		fseek(fp, mid_slice_pos + start_frame_pos, SEEK_SET);
+		
+		fseek(fp, mid_slice_pos, SEEK_SET);
 		fread(buffer, slice_size, 1, fp);
 		status = HKAFFG_Process_Byte_Slice(buffer, target_frame_num, slice_size, &cur_frame_num, &target_pos);
 
+		//æŸ¥æ‰¾æˆåŠŸ
+		if (status == HKA_STS_ERR)
+			return HKA_STS_ERR;
+
 		if (status == HKA_STS_OK)
 		{
-			fseek(fp, target_pos, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			
+			fseek(fp, target_pos, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 			fread(res, sizeof(GROUP_HEADER), 1, fp);
 			return HKA_STS_OK;
 		}
 
-		if (status == HKAFFG_SEARCH_BAD_SLICE)
+		//æŸ¥æ‰¾ç‰‡æ®µä¸­ä¸å­˜åœ¨groupheader??????????????????????????????????????????????????????????????????????????
+		if ((status == HKAFFG_SEARCH_BAD_SLICE) && (status2 == HKAFFG_SEARCH_LEFT)
+		{
+			mid_slice_pos -= slice_size;
+		}
+
+		if ((status == HKAFFG_SEARCH_BAD_SLICE) && (status2 == HKAFFG_SEARCH_RIGHT)
+		{
+			mid_slice_pos += 2*slice_size-3;
+		}
+
+		/*if (status == HKAFFG_SEARCH_BAD_SLICE)
 		{
 			mid_slice_pos += target_pos;
-		}
+			fseek(fp, mid_slice_pos, SEEK_SET);
+			fread(buffer, slice_size, 1, fp);
+			status = HKAFFG_Process_Byte_Slice(buffer, target_frame_num, slice_size, &cur_frame_num, &target_pos);
+			if (status == )
+		}*/
 
 		if (status == HKAFFG_SEARCH_LEFT)
 		{
+			status2 = status;
 			end_frame_pos = target_pos;
 			end_frame_num = cur_frame_num;
+			mid_slice_pos = (end_frame_pos - start_frame_pos)*(target_frame_num - start_frame_num) / (end_frame_num - start_frame_num) + start_frame_pos;
 
 		}
 
 		if (status == HKAFFG_SEARCH_RIGHT)
 		{
-
 			start_frame_pos = target_pos;
 			start_frame_num = cur_frame_num;
 			mid_slice_pos = (end_frame_pos - start_frame_pos)*(target_frame_num - start_frame_num) / (end_frame_num - start_frame_num) + start_frame_pos;
 		}
-
-
 	}
 
 
@@ -202,12 +236,12 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 		exit(1);
 
 	fseek(fp, 0, SEEK_END);
-	unsigned int file_size = ftell(fp);                                       //file_sizeÊµ¼ÊÔÚÊ¹ÓÃµÄÊ±ºòÓ¦¸Ã¼õÈ¥4, ±ÜÃâ³öÏÖgroupµÄstart_codeÔÚ×îºóÒ»¸ö×Ö½Ú³öÏÖ,µ«ÊÇframe_numÈ´²»´æÔÚ,ÍêÕûµÄËµÓ¦¸Ã¼õÈ¥48,Èç¹ûgroup²»ÍêÕû,ÄÇ¾ÍÊÇ²»´æÔÚ
+	unsigned int file_size = ftell(fp);                                       //file_sizeå®é™…åœ¨ä½¿ç”¨çš„æ—¶å€™åº”è¯¥å‡å»4, é¿å…å‡ºç°groupçš„start_codeåœ¨æœ€åä¸€ä¸ªå­—èŠ‚å‡ºç°,ä½†æ˜¯frame_numå´ä¸å­˜åœ¨,å®Œæ•´çš„è¯´åº”è¯¥å‡å»48,å¦‚æœgroupä¸å®Œæ•´,é‚£å°±æ˜¯ä¸å­˜åœ¨
 	fseek(fp, 0, SEEK_SET);
 	//15ms
 
 
-	unsigned int slice_size = SLICE_SIZE;  //¸ù¾İL1 cache 32KBµÄ´óĞ¡ÉèÖÃ
+	unsigned int slice_size = SLICE_SIZE;  //æ ¹æ®L1 cache 32KBçš„å¤§å°è®¾ç½®
 	unsigned int slice_num = (file_size + slice_size - 1) / slice_size;
 
 	unsigned int start_slice = 0;
@@ -232,7 +266,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 		status = HKAFFG_Process_Byte_Slice(buffer, target_frame_num, file_size, &target_pos);
 		if (status == HKA_STS_OK)
 		{
-			fseek(fp, target_pos, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			fseek(fp, target_pos, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 			fread(res, sizeof(GROUP_HEADER), 1, fp);
 			return status;
 		}
@@ -241,7 +275,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 	}
 	//531ms
 
-	//ËÑË÷Ô­Ê¼ÎÄ¼şµÄÆğÊ¼Ö¡ºÅ
+	//æœç´¢åŸå§‹æ–‡ä»¶çš„èµ·å§‹å¸§å·
 	for (int i = 0; i < slice_num; i++)
 	{
 		int slice_start = 0;
@@ -249,10 +283,10 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 		{
 			slice_start = slice_size*i - 3;
 		}
-		fseek(fp, slice_start, SEEK_SET);                 //Èç¹ûÊôÓÚÊÓÆµ¿ªÍ·Æ¬¶ÎµÄ»°,´Ó0¿ªÊ¼ÇĞÆ¬¶Î
+		fseek(fp, slice_start, SEEK_SET);                 //å¦‚æœå±äºè§†é¢‘å¼€å¤´ç‰‡æ®µçš„è¯,ä»0å¼€å§‹åˆ‡ç‰‡æ®µ
 
 
-		//µ±ÇĞ¸îµ½×îºóÒ»¸ösliceÊ±,×îºóÒ»¸ösliceÖĞµÄÊı¾İ¿ÉÄÜĞ¡ÓÚslice_sizeµÄÌØÊâ´¦Àí, ±ÜÃâËÑË÷µÄÊ±ºò³öÏÖÔ½½ç
+		//å½“åˆ‡å‰²åˆ°æœ€åä¸€ä¸ªsliceæ—¶,æœ€åä¸€ä¸ªsliceä¸­çš„æ•°æ®å¯èƒ½å°äºslice_sizeçš„ç‰¹æ®Šå¤„ç†, é¿å…æœç´¢çš„æ—¶å€™å‡ºç°è¶Šç•Œ
 		if ((file_size - slice_start - 3) < slice_size)
 		{
 			slice_size = file_size - slice_size*i;
@@ -270,11 +304,11 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 			break;
 		}
 	}
-	//Èç¹ûÃ»ÓĞËÑË÷µ½ÆğÊ¼Ö¡ºÅ,ËµÃ÷Ô­Ê¼ÎÄ¼şÖĞÃ»ÓĞÍêÕûÖ¡ĞÅÏ¢,½áÊøº¯Êı
+	//å¦‚æœæ²¡æœ‰æœç´¢åˆ°èµ·å§‹å¸§å·,è¯´æ˜åŸå§‹æ–‡ä»¶ä¸­æ²¡æœ‰å®Œæ•´å¸§ä¿¡æ¯,ç»“æŸå‡½æ•°
 	if (start_frame_num == -1)
 		return HKA_STS_ERR;
 	//546
-	//ËÑË÷Ô­Ê¼ÎÄ¼şµÄ½áÊøÖ¡ºÅ
+	//æœç´¢åŸå§‹æ–‡ä»¶çš„ç»“æŸå¸§å·
 	for (int i = 1; i <slice_num; i++)
 	{
 		int slice_start = slice_size*i + 3;
@@ -283,7 +317,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 			slice_size = slice_start - file_size;
 			slice_start = file_size;
 		}
-		fseek(fp, -slice_start, SEEK_END);               //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+		fseek(fp, -slice_start, SEEK_END);               //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 
 		fread(buffer, slice_size + 3, 1, fp);
 		status = HKAFFG_Searching_End_Group(buffer, slice_size + 3, &end_frame_pos);
@@ -296,7 +330,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 			break;
 		}
 	}
-	//Èç¹ûÃ»ÓĞËÑË÷µ½½áÊøÖ¡ºÅ,ËµÃ÷Ô­Ê¼ÎÄ¼şÖĞÃ»ÓĞÍêÕûÖ¡ĞÅÏ¢,½áÊøº¯Êı
+	//å¦‚æœæ²¡æœ‰æœç´¢åˆ°ç»“æŸå¸§å·,è¯´æ˜åŸå§‹æ–‡ä»¶ä¸­æ²¡æœ‰å®Œæ•´å¸§ä¿¡æ¯,ç»“æŸå‡½æ•°
 	if (end_frame_num == -1)
 		return HKA_STS_ERR;
 
@@ -308,7 +342,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 			return HKA_STS_ERR;
 	}
 
-	////¿ªÊ¼ÔÚ½øĞĞslice¼¶±ğµÄ¶ş·Ö²éÕÒ
+	////å¼€å§‹åœ¨è¿›è¡Œsliceçº§åˆ«çš„äºŒåˆ†æŸ¥æ‰¾
 	slice_size = SLICE_SIZE;
 	unsigned int slice_num_gap;
 	unsigned int mid_slice;
@@ -324,7 +358,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 		}
 		else
 		{
-			fseek(fp, slice_size*mid_slice - 3, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			fseek(fp, slice_size*mid_slice - 3, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 		}
 
 
@@ -342,7 +376,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 			{
 				target_pos += slice_size*mid_slice - 3;
 			}
-			fseek(fp, target_pos, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			fseek(fp, target_pos, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 			fread(res, sizeof(GROUP_HEADER), 1, fp);
 			return HKA_STS_OK;
 		}
@@ -350,7 +384,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 		if (status == HKAFFG_SEARCH_LEFT)
 		{
 
-			end_slice = mid_slice-1;
+			end_slice = mid_slice - 1;
 			end_frame_pos = target_pos;
 			end_frame_num = (unsigned int *)(buffer + end_frame_pos + 4);
 		}
@@ -358,7 +392,7 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 		if (status == HKAFFG_SEARCH_RIGHT)
 		{
 
-			start_slice = mid_slice+1;
+			start_slice = mid_slice + 1;
 			start_frame_pos = target_pos;
 			start_frame_num = (unsigned int *)(buffer + start_frame_pos + 4);
 		}
@@ -375,17 +409,17 @@ HKA_STATUS HKAFFG_Process_Test_V2(FILE *fp, unsigned char *buffer, int target_fr
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£ºÄ£¿é¹¦ÄÜ´¦Àíº¯Êı
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæ¨¡å—åŠŸèƒ½å¤„ç†å‡½æ•°
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame_num, GROUP_HEADER *res)
 {
@@ -393,13 +427,13 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 		exit(1);
 
 	fseek(fp, 0, SEEK_END);
-	unsigned int file_size = ftell(fp);                                       //file_sizeÊµ¼ÊÔÚÊ¹ÓÃµÄÊ±ºòÓ¦¸Ã¼õÈ¥4, ±ÜÃâ³öÏÖgroupµÄstart_codeÔÚ×îºóÒ»¸ö×Ö½Ú³öÏÖ,µ«ÊÇframe_numÈ´²»´æÔÚ,ÍêÕûµÄËµÓ¦¸Ã¼õÈ¥48,Èç¹ûgroup²»ÍêÕû,ÄÇ¾ÍÊÇ²»´æÔÚ
+	unsigned int file_size = ftell(fp);                                       //file_sizeå®é™…åœ¨ä½¿ç”¨çš„æ—¶å€™åº”è¯¥å‡å»4, é¿å…å‡ºç°groupçš„start_codeåœ¨æœ€åä¸€ä¸ªå­—èŠ‚å‡ºç°,ä½†æ˜¯frame_numå´ä¸å­˜åœ¨,å®Œæ•´çš„è¯´åº”è¯¥å‡å»48,å¦‚æœgroupä¸å®Œæ•´,é‚£å°±æ˜¯ä¸å­˜åœ¨
 	fseek(fp, 0, SEEK_SET);
 	//15ms
 
 
-	unsigned int slice_size = SLICE_SIZE;  //¸ù¾İL1 cache 32KBµÄ´óĞ¡ÉèÖÃ
-	unsigned int slice_num = (file_size+slice_size-1) / slice_size;  
+	unsigned int slice_size = SLICE_SIZE;  //æ ¹æ®L1 cache 32KBçš„å¤§å°è®¾ç½®
+	unsigned int slice_num = (file_size + slice_size - 1) / slice_size;
 
 	unsigned int start_slice = 0;
 	unsigned int end_slice = slice_num - 1;
@@ -423,7 +457,7 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 		status = HKAFFG_Process_Byte_Slice(buffer, target_frame_num, file_size, target_pos);
 		if (status == HKA_STS_OK)
 		{
-			fseek(fp, target_pos, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			fseek(fp, target_pos, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 			fread(res, sizeof(GROUP_HEADER), 1, fp);
 			return status;
 		}
@@ -432,7 +466,7 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 	}
 	//531ms
 
-	//ËÑË÷Ô­Ê¼ÎÄ¼şµÄÆğÊ¼Ö¡ºÅ
+	//æœç´¢åŸå§‹æ–‡ä»¶çš„èµ·å§‹å¸§å·
 	for (int i = 0; i < slice_num; i++)
 	{
 		int slice_start = 0;
@@ -440,43 +474,43 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 		{
 			slice_start = slice_size*i - 3;
 		}
-		fseek(fp, slice_start, SEEK_SET);                 //Èç¹ûÊôÓÚÊÓÆµ¿ªÍ·Æ¬¶ÎµÄ»°,´Ó0¿ªÊ¼ÇĞÆ¬¶Î
+		fseek(fp, slice_start, SEEK_SET);                 //å¦‚æœå±äºè§†é¢‘å¼€å¤´ç‰‡æ®µçš„è¯,ä»0å¼€å§‹åˆ‡ç‰‡æ®µ
 
 
-		//µ±ÇĞ¸îµ½×îºóÒ»¸ösliceÊ±,×îºóÒ»¸ösliceÖĞµÄÊı¾İ¿ÉÄÜĞ¡ÓÚslice_sizeµÄÌØÊâ´¦Àí, ±ÜÃâËÑË÷µÄÊ±ºò³öÏÖÔ½½ç
-		if ((file_size - slice_start-3) < slice_size)
+		//å½“åˆ‡å‰²åˆ°æœ€åä¸€ä¸ªsliceæ—¶,æœ€åä¸€ä¸ªsliceä¸­çš„æ•°æ®å¯èƒ½å°äºslice_sizeçš„ç‰¹æ®Šå¤„ç†, é¿å…æœç´¢çš„æ—¶å€™å‡ºç°è¶Šç•Œ
+		if ((file_size - slice_start - 3) < slice_size)
 		{
 			slice_size = file_size - slice_size*i;
 		}
 
-		fread(buffer, slice_size+3, 1, fp);
-		status = HKAFFG_Searching_Start_Group(buffer, slice_size + 3, &start_frame_pos);                     
-		
+		fread(buffer, slice_size + 3, 1, fp);
+		status = HKAFFG_Searching_Start_Group(buffer, slice_size + 3, &start_frame_pos);
+
 		if (status == HKA_STS_OK)
 		{
 			//unsigned int *x = (unsigned int *)(buffer + start_frame_pos+4);
 			start_frame_num = *(buffer + start_frame_pos + 4);
-			start_frame_num = (start_frame_num<<8) + *(buffer + start_frame_pos + 3);
+			start_frame_num = (start_frame_num << 8) + *(buffer + start_frame_pos + 3);
 			start_frame_num = (start_frame_num << 8) + *(buffer + start_frame_pos + 2);
-			start_frame_num = (start_frame_num << 8) + *(buffer + start_frame_pos+1);
+			start_frame_num = (start_frame_num << 8) + *(buffer + start_frame_pos + 1);
 			start_frame_pos = slice_start + start_frame_pos;
 			break;
 		}
 	}
-	//Èç¹ûÃ»ÓĞËÑË÷µ½ÆğÊ¼Ö¡ºÅ,ËµÃ÷Ô­Ê¼ÎÄ¼şÖĞÃ»ÓĞÍêÕûÖ¡ĞÅÏ¢,½áÊøº¯Êı
+	//å¦‚æœæ²¡æœ‰æœç´¢åˆ°èµ·å§‹å¸§å·,è¯´æ˜åŸå§‹æ–‡ä»¶ä¸­æ²¡æœ‰å®Œæ•´å¸§ä¿¡æ¯,ç»“æŸå‡½æ•°
 	if (start_frame_num == -1)
 		return HKA_STS_ERR;
 	//546
-	//ËÑË÷Ô­Ê¼ÎÄ¼şµÄ½áÊøÖ¡ºÅ
+	//æœç´¢åŸå§‹æ–‡ä»¶çš„ç»“æŸå¸§å·
 	for (int i = 1; i <slice_num; i++)
 	{
-		int slice_start = slice_size*i+3;
+		int slice_start = slice_size*i + 3;
 		if (slice_start > file_size)
 		{
-			slice_size = slice_start -  file_size;
+			slice_size = slice_start - file_size;
 			slice_start = file_size;
 		}
-		fseek(fp, -slice_start, SEEK_END);               //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+		fseek(fp, -slice_start, SEEK_END);               //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 
 		fread(buffer, slice_size + 3, 1, fp);
 		status = HKAFFG_Searching_End_Group(buffer, slice_size + 3, &end_frame_pos);
@@ -488,14 +522,14 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 			break;
 		}
 	}
-	//Èç¹ûÃ»ÓĞËÑË÷µ½½áÊøÖ¡ºÅ,ËµÃ÷Ô­Ê¼ÎÄ¼şÖĞÃ»ÓĞÍêÕûÖ¡ĞÅÏ¢,½áÊøº¯Êı
+	//å¦‚æœæ²¡æœ‰æœç´¢åˆ°ç»“æŸå¸§å·,è¯´æ˜åŸå§‹æ–‡ä»¶ä¸­æ²¡æœ‰å®Œæ•´å¸§ä¿¡æ¯,ç»“æŸå‡½æ•°
 	if (end_frame_num == -1)
 		return HKA_STS_ERR;
 
 
-	////¿ªÊ¼ÔÚ½øĞĞslice¼¶±ğµÄ¶ş·Ö²éÕÒ
+	////å¼€å§‹åœ¨è¿›è¡Œsliceçº§åˆ«çš„äºŒåˆ†æŸ¥æ‰¾
 	slice_size = SLICE_SIZE;
-	unsigned int slice_num_gap ;
+	unsigned int slice_num_gap;
 	unsigned int mid_slice;
 
 	while (1)
@@ -503,7 +537,7 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 		slice_num_gap = slice_num / (end_frame_num - start_frame_num);
 		mid_slice = slice_num_gap*(target_frame_num - start_frame_num) + start_slice;
 
-		fseek(fp, slice_size*mid_slice - 3, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+		fseek(fp, slice_size*mid_slice - 3, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 
 		if ((file_size - slice_size*mid_slice) < slice_size)
 		{
@@ -516,7 +550,7 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 		if (status == HKA_STS_OK)
 		{
 			target_pos += slice_size*mid_slice - 3;
-			fseek(fp, target_pos, SEEK_SET);   //Èç¹û²»ÊÇ¿ªÍ·,ÇĞÆ¬¶ÎµÄÆğÊ¼Î»ÖÃĞèÒªÏÈÇ°Æ«3¸öByteÎ»ÖÃ,±ÜÃâ4ByteµÄÓĞĞ§Êı¾İStart_code±»sliceÇĞ¶ÏÒıÆğµÄ²éÕÒÊ§°Ü
+			fseek(fp, target_pos, SEEK_SET);   //å¦‚æœä¸æ˜¯å¼€å¤´,åˆ‡ç‰‡æ®µçš„èµ·å§‹ä½ç½®éœ€è¦å…ˆå‰å3ä¸ªByteä½ç½®,é¿å…4Byteçš„æœ‰æ•ˆæ•°æ®Start_codeè¢«sliceåˆ‡æ–­å¼•èµ·çš„æŸ¥æ‰¾å¤±è´¥
 			fread(res, sizeof(GROUP_HEADER), 1, fp);
 			return HKA_STS_OK;
 		}
@@ -546,57 +580,57 @@ HKA_STATUS HKAFFG_Process_Test(FILE *fp, unsigned char *buffer, int target_frame
 	}
 	//free(buffer);
 
-	
+
 
 }
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º²éÕÒÒ»¸öÊı¾İÆ¬¶ÎÖĞµÄÆğÊ¼Ö¡ºÅ
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæŸ¥æ‰¾ä¸€ä¸ªæ•°æ®ç‰‡æ®µä¸­çš„èµ·å§‹å¸§å·
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Searching_Start_Group(unsigned char *buffer, unsigned int slice_size, unsigned int *pos_offset)
 {
 	unsigned int data_4byte = 0;
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	data_4byte = (data_4byte << 8) + (*(buffer + 2));
 	data_4byte = (data_4byte << 8) + (*(buffer + 1));
 	data_4byte = (data_4byte << 8) + (*(buffer + 0));
 	data_4byte = data_4byte << 8;
-	for (int i = 0; i < slice_size-3; i++)
+	for (int i = 0; i < slice_size - 3; i++)
 	{
-		data_4byte = ((data_4byte) >> 8) | ((*(buffer + i+3)) << 24);
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		data_4byte = ((data_4byte) >> 8) | ((*(buffer + i + 3)) << 24);
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
 			*pos_offset = i;
 			return HKA_STS_OK;
 		}
 	}
-	*pos_offset =-1;
+	*pos_offset = -1;
 	return HKA_STS_ERR;
 }
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º²éÕÒÒ»¸öÊı¾İÆ¬¶ÎÖĞµÄ½áÊøÖ¡ºÅ
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæŸ¥æ‰¾ä¸€ä¸ªæ•°æ®ç‰‡æ®µä¸­çš„ç»“æŸå¸§å·
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Searching_End_Group(unsigned char *buffer, unsigned int slice_size, unsigned int *pos_offset)
 {
@@ -604,13 +638,13 @@ HKA_STATUS HKAFFG_Searching_End_Group(unsigned char *buffer, unsigned int slice_
 	data_4byte = (data_4byte << 8) + (*(buffer + slice_size - 1));
 	data_4byte = (data_4byte << 8) + (*(buffer + slice_size - 2));
 	data_4byte = (data_4byte << 8) + (*(buffer + slice_size - 3));
-	
-	//²éÕÒ½áÊøÖ¡ºÅ
-	for (int i = slice_size - 4; i >=0; i--)
+
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
+	for (int i = slice_size - 4; i >= 0; i--)
 	{
-		
-		data_4byte = ((data_4byte) << 8) | (*(buffer + i));                           //´ÓµÍÎ»¶ÁÈëÒ»¸ö×Ö½Ú	 
-		if (data_4byte == 0x00000001)												  //ÕÒµ½group header
+
+		data_4byte = ((data_4byte) << 8) | (*(buffer + i));                           //ä»ä½ä½è¯»å…¥ä¸€ä¸ªå­—èŠ‚	 
+		if (data_4byte == 0x00000001)												  //æ‰¾åˆ°group header
 		{
 			*pos_offset = i;
 
@@ -625,7 +659,7 @@ HKA_STATUS HKAFFG_Searching_End_Group(unsigned char *buffer, unsigned int slice_
 unsigned int HKAFFG_Combine_4Byte(unsigned char *buffer, unsigned int start_pos)
 {
 	unsigned int data_4byte = 0;
-	data_4byte = (data_4byte << 8) + (*(buffer + start_pos+3));
+	data_4byte = (data_4byte << 8) + (*(buffer + start_pos + 3));
 	data_4byte = (data_4byte << 8) + (*(buffer + start_pos + 2));
 	data_4byte = (data_4byte << 8) + (*(buffer + start_pos + 1));
 	data_4byte = (data_4byte << 8) + (*(buffer + start_pos));
@@ -634,17 +668,17 @@ unsigned int HKAFFG_Combine_4Byte(unsigned char *buffer, unsigned int start_pos)
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º²éÕÒÒ»¸öÊı¾İÆ¬¶ÎÖĞÊÇ·ñ´æÔÚÄ¿±êÖ¡ºÅ
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæŸ¥æ‰¾ä¸€ä¸ªæ•°æ®ç‰‡æ®µä¸­æ˜¯å¦å­˜åœ¨ç›®æ ‡å¸§å·
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 
 HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
@@ -653,7 +687,7 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 	unsigned int *return_frame_num,
 	unsigned int *pos_offset)
 {
-	*pos_offset = -1;                 //³õÊ¼»¯Êä³öÎªÊ§°ÜÊ±µÄÊä³ö
+	*pos_offset = -1;                 //åˆå§‹åŒ–è¾“å‡ºä¸ºå¤±è´¥æ—¶çš„è¾“å‡º
 	//unsigned int *data_4byte;
 	unsigned int len = file_size;
 	unsigned int start_frame_num = -1;
@@ -667,24 +701,24 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 
 	unsigned int data_4byte = 0;
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	HKAFFG_Searching_Start_Group(buffer, file_size, &start);
 	start_group_header = (GROUP_HEADER *)(buffer + start);
-	start_frame_num = start_group_header->frame_num;                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
-	//²éÕÒ½áÊøÖ¡ºÅ
+	start_frame_num = start_group_header->frame_num;                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 
 	HKAFFG_Searching_End_Group(buffer, file_size, &end);
 	end_group_header = (GROUP_HEADER *)(buffer + end);
-	end_frame_num = end_group_header->frame_num;                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+	end_frame_num = end_group_header->frame_num;                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == -1) || (end_frame_num == -1))
 	{
 		*pos_offset = end;
 		*return_frame_num = end_frame_num;
 		return HKAFFG_SEARCH_BAD_SLICE;
-		
+
 	}
 
 	if (target_frame_num < start_frame_num)
@@ -717,12 +751,12 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 	}
 
 
-	//start end ¼ÇÂ¼µÄÊÇµÚÒ»¸ögroup ºÍ×îºóÒ»¸ögroupµÄÆğÊ¼µØÖ·
+	//start end è®°å½•çš„æ˜¯ç¬¬ä¸€ä¸ªgroup å’Œæœ€åä¸€ä¸ªgroupçš„èµ·å§‹åœ°å€
 	GROUP_HEADER *cur_group_header;
 	long gap = (end - start) / (end_frame_num - start_frame_num);
 	long mid_pos = (target_frame_num - start_frame_num)*gap + start;
 
-	while (1)						//start ºÍ end ¿ªÊ¼Ò»Ö±Ö¸Ïògroup header
+	while (1)						//start å’Œ end å¼€å§‹ä¸€ç›´æŒ‡å‘group header
 	{
 		data_4byte = HKAFFG_Combine_4Byte(buffer, mid_pos);
 		while ((data_4byte != 0x00000001) && (mid_pos < len))
@@ -739,7 +773,7 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 		{
 			*pos_offset = mid_pos;
 			*return_frame_num = target_frame_num;
-			return HKA_STS_OK;     //ËÑË÷³É¹¦
+			return HKA_STS_OK;     //æœç´¢æˆåŠŸ
 		}
 
 		if (cur_group_header->frame_num > target_frame_num)
@@ -762,9 +796,10 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 						}
 						if (cur_group_header->frame_num < target_frame_num)
 						{
-							mid_pos - j;
+							/*mid_pos - j;
 							*return_frame_num = cur_group_header->frame_num;
-							return HKAFFG_SEARCH_RIGHT;
+							return HKAFFG_SEARCH_RIGHT;*/
+							return HKA_STS_ERR;
 						}
 						if (cur_group_header->frame_num > target_frame_num)
 						{
@@ -783,7 +818,7 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 		/*********************************************************************************/
 		else //((buffer[mid_pos + 1] < target_frame_num))
 		{
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½Ó½üÊ±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameæ¥è¿‘æ—¶
 			if (start == mid_pos)
 			{
 				int j = 0;
@@ -811,7 +846,7 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 					j++;
 				}
 			}
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½ÏÔ¶Ê±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameè¾ƒè¿œæ—¶
 
 			start = mid_pos;
 			start_frame_num = cur_group_header->frame_num;
@@ -823,17 +858,17 @@ HKA_STATUS HKAFFG_Process_Byte_Slice(unsigned char *buffer,
 }
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£ºÄ£¿é¹¦ÄÜ´¦Àíº¯Êı
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæ¨¡å—åŠŸèƒ½å¤„ç†å‡½æ•°
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 	int target_frame_num,
@@ -861,40 +896,40 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 	long start = 10;
 	long end = 6736069;
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	for (int i = 0; i < len; i++)
 	{
-		data_4byte =  (buffer+i);
+		data_4byte = (buffer + i);
 		//printf("data_4byte is %d", *data_4byte);
-		if ((*data_4byte == 0x484B4D34) || (*data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		if ((*data_4byte == 0x484B4D34) || (*data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		{
 			i = i + 40;
 			i--;
 			continue;
 		}
-		if (*data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (*data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
 			first_group_header = (GROUP_HEADER *)(buffer + i);
-			start_frame_num = first_group_header->frame_num;                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			start_frame_num = first_group_header->frame_num;                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			start = i;
 			break;
 		}
 	}
 
-	//²éÕÒ½áÊøÖ¡ºÅ
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 	for (int i = len - 1; i >= 0; i--)
 	{
 		data_4byte = (unsigned int *)(buffer + i);
-		if (*data_4byte == 0x00000001)												  //ÕÒµ½group header
+		if (*data_4byte == 0x00000001)												  //æ‰¾åˆ°group header
 		{
 			end_group_header = (GROUP_HEADER *)(buffer + i);
-			end_frame_num = end_group_header->frame_num;                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			end_frame_num = end_group_header->frame_num;                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			end = i;
 			break;
 		}
 	}
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == 0) || (end_frame_num == 0))
 	{
 		return HKA_STS_ERR;
@@ -906,7 +941,7 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 	}
 
 
-	if (start == end)  //Èç¹ûÖ»ÓĞÒ»¸ögroupµÄÇé¿ö
+	if (start == end)  //å¦‚æœåªæœ‰ä¸€ä¸ªgroupçš„æƒ…å†µ
 	{
 		if (start_frame_num == target_frame_num)
 		{
@@ -918,15 +953,15 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 		}
 	}
 
-	//start end ¼ÇÂ¼µÄÊÇµÚÒ»¸ögroup ºÍ×îºóÒ»¸ögroupµÄÆğÊ¼µØÖ·
+	//start end è®°å½•çš„æ˜¯ç¬¬ä¸€ä¸ªgroup å’Œæœ€åä¸€ä¸ªgroupçš„èµ·å§‹åœ°å€
 	GROUP_HEADER *cur_group_header;
 	long gap = (end - start) / (end_frame_num - start_frame_num);
 	long mid_pos = (target_frame_num - start_frame_num)*gap + start;
 	long old_pos;
 
-	while (1)						//start ºÍ end ¿ªÊ¼Ò»Ö±Ö¸Ïògroup header
+	while (1)						//start å’Œ end å¼€å§‹ä¸€ç›´æŒ‡å‘group header
 	{
-		while ((*((unsigned int* )(buffer+mid_pos)) != 0x00000001) && (mid_pos < len))
+		while ((*((unsigned int*)(buffer + mid_pos)) != 0x00000001) && (mid_pos < len))
 		{
 			mid_pos++;
 		}
@@ -934,10 +969,10 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 		{
 			return HKA_STS_ERR;
 		}
-		cur_group_header = (GROUP_HEADER *)(buffer + mid_pos); 
+		cur_group_header = (GROUP_HEADER *)(buffer + mid_pos);
 		if (cur_group_header->frame_num == target_frame_num)
 		{
-			return HKA_STS_OK;     //ËÑË÷³É¹¦
+			return HKA_STS_OK;     //æœç´¢æˆåŠŸ
 		}
 
 		if (cur_group_header->frame_num > target_frame_num)
@@ -950,7 +985,7 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 				{
 					if ((*((unsigned int*)(buffer + mid_pos - j))) == 0x00000001)
 					{
-						cur_group_header = (GROUP_HEADER *)(buffer + mid_pos-j);
+						cur_group_header = (GROUP_HEADER *)(buffer + mid_pos - j);
 						if (cur_group_header->frame_num == target_frame_num)
 						{
 							return HKA_STS_OK;
@@ -977,7 +1012,7 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 		/*********************************************************************************/
 		else //((buffer[mid_pos + 1] < target_frame_num))
 		{
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½Ó½üÊ±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameæ¥è¿‘æ—¶
 			if (start == mid_pos)
 			{
 				int j = 0;
@@ -1002,7 +1037,7 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 					j++;
 				}
 			}
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½ÏÔ¶Ê±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameè¾ƒè¿œæ—¶
 
 			start = mid_pos;
 			start_frame_num = cur_group_header->frame_num;
@@ -1014,17 +1049,17 @@ HKA_STATUS HKAFFG_Process_Byte(char *buffer,
 }
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º±©Á¦²éÕÒ ,ÊäÈëÊı¾İÒÔchar *ÀàĞÍ´«Èë
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæš´åŠ›æŸ¥æ‰¾ ,è¾“å…¥æ•°æ®ä»¥char *ç±»å‹ä¼ å…¥
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Get_All_Byte(char *buffer,
 	int target_frame_num,
@@ -1041,40 +1076,40 @@ HKA_STATUS HKAFFG_Get_All_Byte(char *buffer,
 	long start = 10;
 	long end = 6736069;
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	for (int i = 0; i < len; i++)
 	{
 		data_4byte = (unsigned int *)(buffer + i);
 		//printf("data_4byte is %d", *data_4byte);
-		if ((*data_4byte == 0x484B4D34) || (*data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		if ((*data_4byte == 0x484B4D34) || (*data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		{
 			i = i + 40;
 			i--;
 			continue;
 		}
-		if (*data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (*data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
 			first_group_header = (GROUP_HEADER *)(buffer + i);
-			start_frame_num = first_group_header->frame_num;                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			start_frame_num = first_group_header->frame_num;                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			start = i;
 			break;
 		}
 	}
 
-	//²éÕÒ½áÊøÖ¡ºÅ
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 	for (int i = len - 1; i >= 0; i--)
 	{
 		data_4byte = (unsigned int *)(buffer + i);
-		if (*data_4byte == 0x00000001)												  //ÕÒµ½group header
+		if (*data_4byte == 0x00000001)												  //æ‰¾åˆ°group header
 		{
 			end_group_header = (GROUP_HEADER *)(buffer + i);
-			end_frame_num = end_group_header->frame_num;                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			end_frame_num = end_group_header->frame_num;                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			end = i;
 			break;
 		}
 	}
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == 0) || (end_frame_num == 0))
 	{
 		return HKA_STS_ERR;
@@ -1088,17 +1123,17 @@ HKA_STATUS HKAFFG_Get_All_Byte(char *buffer,
 
 	//
 	GROUP_HEADER *cur_group_header;
-	for (int i = 0; i < len-4; i++)
+	for (int i = 0; i < len - 4; i++)
 	{
-		data_4byte = (unsigned int *)(buffer+i);
-		if (*data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		data_4byte = (unsigned int *)(buffer + i);
+		if (*data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			cur_group_header = (GROUP_HEADER *)(buffer+i);                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			cur_group_header = (GROUP_HEADER *)(buffer + i);                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			//printf("Frame number is %d, start position is %d \n", frame_num, i);
 
 			if (cur_group_header->frame_num == target_frame_num)
 			{
-				//printf("¼ìË÷³É¹¦, Ö¡ºÅÎª %d\n", frame_num);
+				//printf("æ£€ç´¢æˆåŠŸ, å¸§å·ä¸º %d\n", frame_num);
 				return HKA_STS_OK;
 			}
 
@@ -1110,17 +1145,17 @@ HKA_STATUS HKAFFG_Get_All_Byte(char *buffer,
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º±©Á¦·½·¨²éÕÒÖ¡ºÅ
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º
+* åŠŸ  èƒ½ï¼šæš´åŠ›æ–¹æ³•æŸ¥æ‰¾å¸§å·
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼š
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Process_V5(unsigned int *buffer,
 	int target_frame_number,
@@ -1135,42 +1170,42 @@ HKA_STATUS HKAFFG_Process_V5(unsigned int *buffer,
 	unsigned int start_frame_num = 0;
 	unsigned int end_frame_num = 0;
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	for (int i = 0; i < len - 1; i++)
 	{
 		data_4byte = buffer[i];
-		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		{
 			i = i + FILE_HEADER_SIZE;
 			i--;
 			continue;
 		}
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			start_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			start_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			break;
 		}
 	}
 
-	//²éÕÒ½áÊøÖ¡ºÅ
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 	for (int i = len - 1; i >= 0; i--)
 	{
 		data_4byte = buffer[i];
-		//if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		//if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		//{
 		//	i = i + FILE_HEADER_SIZE;
 		//	i--;
 		//	continue;
 		//}
 
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			end_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			end_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			break;
 		}
 	}
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == 0) || (end_frame_num == 0))
 	{
 		return HKA_STS_ERR;
@@ -1187,46 +1222,46 @@ HKA_STATUS HKAFFG_Process_V5(unsigned int *buffer,
 	for (int i = 0; i < len; i++)
 	{
 		data_4byte = buffer[i];
-		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		{
 			i = i + 10;
 			i--;
 
 			continue;
 		}
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
 
-			frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			//printf("Frame number is %d, start position is %d \n", frame_num, i);
 
 			if (frame_num == target_frame_number)
 			{
-				//printf("¼ìË÷³É¹¦, Ö¡ºÅÎª %d\n", frame_num);
+				//printf("æ£€ç´¢æˆåŠŸ, å¸§å·ä¸º %d\n", frame_num);
 				return HKA_STS_OK;
 			}
 
-			block_num = buffer[i + 4] - 0x00001000;    //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+16Îªblock_numÊı¾İµÄµØÖ·ÆğÊ¼Î»ÖÃ
+			block_num = buffer[i + 4] - 0x00001000;    //iä¸ºgroup headerçš„åœ°å€åç§», i+16ä¸ºblock_numæ•°æ®çš„åœ°å€èµ·å§‹ä½ç½®
 
 			for (int j = 0; j < block_num; j++)
 			{
-				i = i + 12;										   //Ìøµ½block headerµØÖ·
-				block_size = buffer[i + 4];                        //»ñµÃµ±Ç°block dataµÄ´óĞ¡
-				i = i + 5 + block_size / 4;                          //iÔö´ó,Ìø¹ıblock headerºÍblock dataµÄµØÖ·¶Î
+				i = i + 12;										   //è·³åˆ°block headeråœ°å€
+				block_size = buffer[i + 4];                        //è·å¾—å½“å‰block dataçš„å¤§å°
+				i = i + 5 + block_size / 4;                          //iå¢å¤§,è·³è¿‡block headerå’Œblock dataçš„åœ°å€æ®µ
 			}
-			i--;																 //ÓÉÓÚforÑ­»·±¾Éí»á×Ô¼Ó,ÔÚ¼ì²âµ½ file header»òÕßgroup headerºó»á×öiµÄ¸üĞÂ,´ËÊ±forÑ­»·µÄi++»á¶àÓÚ,¹Ê´Ë´¦¼õ1
+			i--;																 //ç”±äºforå¾ªç¯æœ¬èº«ä¼šè‡ªåŠ ,åœ¨æ£€æµ‹åˆ° file headeræˆ–è€…group headeråä¼šåšiçš„æ›´æ–°,æ­¤æ—¶forå¾ªç¯çš„i++ä¼šå¤šäº,æ•…æ­¤å¤„å‡1
 		}
 	}
 	return HKA_STS_ERR;
 }
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º¶ş·Ö²éÕÒ·¨½øĞĞgroup²éÕÒ
-* ²Î  Êı£º*
-*         size        -I    ËùĞè·ÖÅäµÄÄÚ´æ´óĞ¡
-*         align       -I    ¶ÔÆëµÄ×Ö½ÚÊı£¬ĞèÒªÎª2µÄÃİ´Î·½
-* ·µ»ØÖµ£ºËù·ÖÅäÄÚ´æÖ¸Õë
-* ±¸  ×¢£ºÓĞÎÊÌâ,¿ÉÄÜ´æÔÚÔÚÒ»¶ÎÃ»ÓĞgroup headerµÄÊı¾İ¶ÎÖĞËÑË÷,ÕâÑù¾Í»áËÀÑ­»·ÁË
+* åŠŸ  èƒ½ï¼šäºŒåˆ†æŸ¥æ‰¾æ³•è¿›è¡ŒgroupæŸ¥æ‰¾
+* å‚  æ•°ï¼š*
+*         size        -I    æ‰€éœ€åˆ†é…çš„å†…å­˜å¤§å°
+*         align       -I    å¯¹é½çš„å­—èŠ‚æ•°ï¼Œéœ€è¦ä¸º2çš„å¹‚æ¬¡æ–¹
+* è¿”å›å€¼ï¼šæ‰€åˆ†é…å†…å­˜æŒ‡é’ˆ
+* å¤‡  æ³¨ï¼šæœ‰é—®é¢˜,å¯èƒ½å­˜åœ¨åœ¨ä¸€æ®µæ²¡æœ‰group headerçš„æ•°æ®æ®µä¸­æœç´¢,è¿™æ ·å°±ä¼šæ­»å¾ªç¯äº†
 ***************************************************************************************************/
 //HKA_STATUS HKAFFG_Process_V6(unsigned int *buffer,
 //	int target_frame_number,
@@ -1246,37 +1281,37 @@ HKA_STATUS HKAFFG_Process_V5(unsigned int *buffer,
 //
 //
 //
-//	//²éÕÒÆğÊ¼Ö¡ºÅ
+//	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 //	for (int i = 0; i < len; i++)
 //	{
 //		data_4byte = buffer[i];
-//		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+//		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 //		{
 //			i = i + 10;
 //			i--;
 //			continue;
 //		}
-//		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+//		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 //		{
-//			start_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+//			start_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 //			start = i;
 //			break;
 //		}
 //	}
 //
-//	//²éÕÒ½áÊøÖ¡ºÅ
+//	//æŸ¥æ‰¾ç»“æŸå¸§å·
 //	for (int i = len - 1; i >= 0; i--)
 //	{
 //		data_4byte = buffer[i];
-//		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+//		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 //		{
-//			end_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+//			end_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 //			end = i;
 //			break;
 //		}
 //	}
 //
-//	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+//	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 //	if ((start_frame_num == 0) || (end_frame_num == 0))
 //	{
 //		return HKA_STS_ERR;
@@ -1292,25 +1327,25 @@ HKA_STATUS HKAFFG_Process_V5(unsigned int *buffer,
 //	while (start <= end)
 //	{
 //		//printf("%d\n", end - start);
-//		//Ã¿´Î´ÓÄÚ´æÆ¬¶Îºó°ë¶Î²éÕÒµÚÒ»¸ögroup
+//		//æ¯æ¬¡ä»å†…å­˜ç‰‡æ®µååŠæ®µæŸ¥æ‰¾ç¬¬ä¸€ä¸ªgroup
 //		long mid = (start + end) / 2;
 //
 //		for (int i = mid; i <= end; i++)
 //		{
 //			data_4byte = buffer[i];
-//			if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+//			if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 //			{
 //				i = i + 10;
 //				i--;
 //				continue;
 //			}
 //
-//			if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+//			if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 //			{
-//				frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+//				frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 //				if (frame_num == target_frame_number)
 //				{
-//					printf("¼ìË÷³É¹¦, Ö¡ºÅÎª %d\n", frame_num);
+//					printf("æ£€ç´¢æˆåŠŸ, å¸§å·ä¸º %d\n", frame_num);
 //					return HKA_STS_OK;
 //				}
 //
@@ -1334,13 +1369,13 @@ HKA_STATUS HKAFFG_Process_V5(unsigned int *buffer,
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º¶ş·Ö²éÕÒ·¨½øĞĞgroup²éÕÒ
-* ²Î  Êı£º*
-*         size        -I    ËùĞè·ÖÅäµÄÄÚ´æ´óĞ¡
-*         align       -I    ¶ÔÆëµÄ×Ö½ÚÊı£¬ĞèÒªÎª2µÄÃİ´Î·½
-* ·µ»ØÖµ£ºËù·ÖÅäÄÚ´æÖ¸Õë
-* ±¸  ×¢£ºÔÚ½øĞĞ¶ş·Ö²éÕÒµÄÊ±ºò,Îª±ÜÃâmid_pos²»ÔÙ¸üĞÂ,µ±ËÑË÷µ½µÄÖ¡ºÅºÍÄ¿±êÖ¡ºÅ²î¾àÔÚÒ»¶¨·¶Î§ÄÚÊ±,¿ªÊ¼±©Á¦²éÕÒ
-		  ÕâÖÖ·½·¨ÓĞÈ±Ïİ
+* åŠŸ  èƒ½ï¼šäºŒåˆ†æŸ¥æ‰¾æ³•è¿›è¡ŒgroupæŸ¥æ‰¾
+* å‚  æ•°ï¼š*
+*         size        -I    æ‰€éœ€åˆ†é…çš„å†…å­˜å¤§å°
+*         align       -I    å¯¹é½çš„å­—èŠ‚æ•°ï¼Œéœ€è¦ä¸º2çš„å¹‚æ¬¡æ–¹
+* è¿”å›å€¼ï¼šæ‰€åˆ†é…å†…å­˜æŒ‡é’ˆ
+* å¤‡  æ³¨ï¼šåœ¨è¿›è¡ŒäºŒåˆ†æŸ¥æ‰¾çš„æ—¶å€™,ä¸ºé¿å…mid_posä¸å†æ›´æ–°,å½“æœç´¢åˆ°çš„å¸§å·å’Œç›®æ ‡å¸§å·å·®è·åœ¨ä¸€å®šèŒƒå›´å†…æ—¶,å¼€å§‹æš´åŠ›æŸ¥æ‰¾
+è¿™ç§æ–¹æ³•æœ‰ç¼ºé™·
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 	int target_frame_num,
@@ -1356,37 +1391,37 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 	long end = 6736069;
 
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	for (int i = 0; i < len; i++)
 	{
 		data_4byte = buffer[i];
-		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		{
 			i = i + 10;
 			i--;
 			continue;
 		}
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			start_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			start_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			start = i;
 			break;
 		}
 	}
 
-	//²éÕÒ½áÊøÖ¡ºÅ
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 	for (int i = len - 1; i >= 0; i--)
 	{
 		data_4byte = buffer[i];
-		if (data_4byte == 0x00000001)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001)												  //æ‰¾åˆ°group header
 		{
-			end_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			end_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			end = i;
 			break;
 		}
 	}
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == 0) || (end_frame_num == 0))
 	{
 		return HKA_STS_ERR;
@@ -1398,7 +1433,7 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 	}
 
 
-	if (start == end)  //Èç¹ûÖ»ÓĞÒ»¸ögroupµÄÇé¿ö
+	if (start == end)  //å¦‚æœåªæœ‰ä¸€ä¸ªgroupçš„æƒ…å†µ
 	{
 		if (start_frame_num == target_frame_num)
 		{
@@ -1410,13 +1445,13 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 		}
 	}
 
-	//start end ¼ÇÂ¼µÄÊÇµÚÒ»¸ögroup ºÍ×îºóÒ»¸ögroupµÄÆğÊ¼µØÖ·
+	//start end è®°å½•çš„æ˜¯ç¬¬ä¸€ä¸ªgroup å’Œæœ€åä¸€ä¸ªgroupçš„èµ·å§‹åœ°å€
 
 	long gap = (end - start) / (end_frame_num - start_frame_num);
 	long mid_pos = (target_frame_num - start_frame_num)*gap + start;
 	long old_pos;
 
-	while (1)						//start ºÍ end ¿ªÊ¼Ò»Ö±Ö¸Ïògroup header
+	while (1)						//start å’Œ end å¼€å§‹ä¸€ç›´æŒ‡å‘group header
 	{
 		while ((buffer[mid_pos] != 0x00000001) && (mid_pos < len))
 		{
@@ -1429,7 +1464,7 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 
 		if (buffer[mid_pos + 1] == target_frame_num)
 		{
-			return HKA_STS_OK;     //ËÑË÷³É¹¦
+			return HKA_STS_OK;     //æœç´¢æˆåŠŸ
 		}
 
 		if (buffer[mid_pos + 1] > target_frame_num)
@@ -1468,7 +1503,7 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 		/*********************************************************************************/
 		else  // ((buffer[mid_pos + 1] < target_frame_num))
 		{
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½Ó½üÊ±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameæ¥è¿‘æ—¶
 			if ((target_frame_num - buffer[mid_pos + 1]) < 20)
 			{
 				int j = 0;
@@ -1492,7 +1527,7 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 					j++;
 				}
 			}
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½ÏÔ¶Ê±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameè¾ƒè¿œæ—¶
 			start = mid_pos;
 			start_frame_num = buffer[start + 1];
 			gap = (end - start) / (end_frame_num - start_frame_num);
@@ -1507,17 +1542,17 @@ HKA_STATUS HKAFFG_Process_V7(unsigned int *buffer,
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£ºÄ£¿é¹¦ÄÜ´¦Àíº¯Êı
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º¶Ô¿ªÊ¼±©Á¦²éÕÒµÄÅĞ¶ÏÌõ¼ş½øĞĞĞŞ¸Ä,µ±mid_pos²»ÔÙ¸üĞÂµÄÊ±ºò¿ªÊ¼±©Á¦²éÕÒ,¹¦ÄÜ¸üÎª×¼È·
+* åŠŸ  èƒ½ï¼šæ¨¡å—åŠŸèƒ½å¤„ç†å‡½æ•°
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼šå¯¹å¼€å§‹æš´åŠ›æŸ¥æ‰¾çš„åˆ¤æ–­æ¡ä»¶è¿›è¡Œä¿®æ”¹,å½“mid_posä¸å†æ›´æ–°çš„æ—¶å€™å¼€å§‹æš´åŠ›æŸ¥æ‰¾,åŠŸèƒ½æ›´ä¸ºå‡†ç¡®
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Get_All(unsigned int *buffer,
 	int target_frame_number,
@@ -1532,35 +1567,35 @@ HKA_STATUS HKAFFG_Get_All(unsigned int *buffer,
 	unsigned int start_frame_num = 0;
 	unsigned int end_frame_num = 0;
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	for (int i = 0; i < len - 1; i++)
 	{
 		data_4byte = buffer[i];
-		//if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		//if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		//{
 		//	i = i + FILE_HEADER_SIZE;
 		//	i--;
 		//	continue;
 		//}
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			start_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			start_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			break;
 		}
 	}
 
-	//²éÕÒ½áÊøÖ¡ºÅ
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 	for (int i = len - 1; i >= 0; i--)
 	{
 		data_4byte = buffer[i];
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			end_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			end_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			break;
 		}
 	}
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == 0) || (end_frame_num == 0))
 	{
 		return HKA_STS_ERR;
@@ -1578,15 +1613,15 @@ HKA_STATUS HKAFFG_Get_All(unsigned int *buffer,
 	{
 		data_4byte = buffer[i];
 
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
 
-			frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			//printf("Frame number is %d, start position is %d \n", frame_num, i);
 
 			if (frame_num == target_frame_number)
 			{
-				//printf("¼ìË÷³É¹¦, Ö¡ºÅÎª %d\n", frame_num);
+				//printf("æ£€ç´¢æˆåŠŸ, å¸§å·ä¸º %d\n", frame_num);
 				return HKA_STS_OK;
 			}
 
@@ -1597,17 +1632,17 @@ HKA_STATUS HKAFFG_Get_All(unsigned int *buffer,
 
 
 /***************************************************************************************************
-* ¹¦  ÄÜ£º¶ş·Ö²éÕÒ·½·¨,ÊäÈëÊı¾İÒÔunsigned int *ÀàĞÍ´«Èë
-* ²Î  Êı£º*
-*         src_img       -I         Ô´Í¼ÏñÊı¾İ
-*         src_step      -I         Ô´Í¼ÏñĞĞ¼ä¾à
-*         dst_img       -O         Ä¿±êÍ¼ÏñÊı¾İ
-*         dst_step      -I         Ä¿±êÍ¼ÏñĞĞ¼ä¾à
-*         img_size      -I         Í¼Ïñ¿í¸ß£¨Ô´¡¢Ä¿±ê£©
-*         algo_pm       -I         Ëã·¨¿ØÖÆ²ÎÊı£¬ÓĞĞ§·¶Î§[10, 100]
-*         work_buf      -I         ¹¤×÷ÄÚ´æ
-* ·µ»ØÖµ£º×´Ì¬Âë
-* ±¸  ×¢£º¶Ô¿ªÊ¼±©Á¦²éÕÒµÄÅĞ¶ÏÌõ¼ş½øĞĞĞŞ¸Ä,µ±mid_pos²»ÔÙ¸üĞÂµÄÊ±ºò¿ªÊ¼±©Á¦²éÕÒ,¹¦ÄÜ¸üÎª×¼È·
+* åŠŸ  èƒ½ï¼šäºŒåˆ†æŸ¥æ‰¾æ–¹æ³•,è¾“å…¥æ•°æ®ä»¥unsigned int *ç±»å‹ä¼ å…¥
+* å‚  æ•°ï¼š*
+*         src_img       -I         æºå›¾åƒæ•°æ®
+*         src_step      -I         æºå›¾åƒè¡Œé—´è·
+*         dst_img       -O         ç›®æ ‡å›¾åƒæ•°æ®
+*         dst_step      -I         ç›®æ ‡å›¾åƒè¡Œé—´è·
+*         img_size      -I         å›¾åƒå®½é«˜ï¼ˆæºã€ç›®æ ‡ï¼‰
+*         algo_pm       -I         ç®—æ³•æ§åˆ¶å‚æ•°ï¼Œæœ‰æ•ˆèŒƒå›´[10, 100]
+*         work_buf      -I         å·¥ä½œå†…å­˜
+* è¿”å›å€¼ï¼šçŠ¶æ€ç 
+* å¤‡  æ³¨ï¼šå¯¹å¼€å§‹æš´åŠ›æŸ¥æ‰¾çš„åˆ¤æ–­æ¡ä»¶è¿›è¡Œä¿®æ”¹,å½“mid_posä¸å†æ›´æ–°çš„æ—¶å€™å¼€å§‹æš´åŠ›æŸ¥æ‰¾,åŠŸèƒ½æ›´ä¸ºå‡†ç¡®
 ***************************************************************************************************/
 HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 	int target_frame_num,
@@ -1623,37 +1658,37 @@ HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 	long end = 6736069;
 
 
-	//²éÕÒÆğÊ¼Ö¡ºÅ
+	//æŸ¥æ‰¾èµ·å§‹å¸§å·
 	for (int i = 0; i < len; i++)
 	{
 		data_4byte = buffer[i];
-		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //ÕÒµ½file headerÖĞµÄµÚÒ»¸ö³ÉÔ±
+		if ((data_4byte == 0x484B4D34) || (data_4byte == 0x484B4834))					  //æ‰¾åˆ°file headerä¸­çš„ç¬¬ä¸€ä¸ªæˆå‘˜
 		{
 			i = i + 10;
 			i--;
 			continue;
 		}
-		if (data_4byte == 0x00000001U)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001U)												  //æ‰¾åˆ°group header
 		{
-			start_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			start_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			start = i;
 			break;
 		}
 	}
 
-	//²éÕÒ½áÊøÖ¡ºÅ
+	//æŸ¥æ‰¾ç»“æŸå¸§å·
 	for (int i = len - 1; i >= 0; i--)
 	{
 		data_4byte = buffer[i];
-		if (data_4byte == 0x00000001)												  //ÕÒµ½group header
+		if (data_4byte == 0x00000001)												  //æ‰¾åˆ°group header
 		{
-			end_frame_num = buffer[i + 1];                   //iÎªgroup headerµÄµØÖ·Æ«ÒÆ, i+4Îªframe numµÄÆğÊ¼µØÖ·
+			end_frame_num = buffer[i + 1];                   //iä¸ºgroup headerçš„åœ°å€åç§», i+4ä¸ºframe numçš„èµ·å§‹åœ°å€
 			end = i;
 			break;
 		}
 	}
 
-	//»ñµÃÊ×Î²Ö¡ºÅ½á¹ûÅĞ¶Ï,Êµ¼ÊÇé¿öÏÂÖ¡ºÅ»á¼ÓÉÏbaseÖµ0x00001000,ËùÒÔÊ×Î²Ö¡ºÅÈç¹û»¹ÊÇ0µÄ»°,ËµÃ÷»ñµÃÊ§°Ü
+	//è·å¾—é¦–å°¾å¸§å·ç»“æœåˆ¤æ–­,å®é™…æƒ…å†µä¸‹å¸§å·ä¼šåŠ ä¸Šbaseå€¼0x00001000,æ‰€ä»¥é¦–å°¾å¸§å·å¦‚æœè¿˜æ˜¯0çš„è¯,è¯´æ˜è·å¾—å¤±è´¥
 	if ((start_frame_num == 0) || (end_frame_num == 0))
 	{
 		return HKA_STS_ERR;
@@ -1665,7 +1700,7 @@ HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 	}
 
 
-	if (start == end)  //Èç¹ûÖ»ÓĞÒ»¸ögroupµÄÇé¿ö
+	if (start == end)  //å¦‚æœåªæœ‰ä¸€ä¸ªgroupçš„æƒ…å†µ
 	{
 		if (start_frame_num == target_frame_num)
 		{
@@ -1677,13 +1712,13 @@ HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 		}
 	}
 
-	//start end ¼ÇÂ¼µÄÊÇµÚÒ»¸ögroup ºÍ×îºóÒ»¸ögroupµÄÆğÊ¼µØÖ·
+	//start end è®°å½•çš„æ˜¯ç¬¬ä¸€ä¸ªgroup å’Œæœ€åä¸€ä¸ªgroupçš„èµ·å§‹åœ°å€
 
 	long gap = (end - start) / (end_frame_num - start_frame_num);
 	long mid_pos = (target_frame_num - start_frame_num)*gap + start;
 	long old_pos;
 
-	while (1)						//start ºÍ end ¿ªÊ¼Ò»Ö±Ö¸Ïògroup header
+	while (1)						//start å’Œ end å¼€å§‹ä¸€ç›´æŒ‡å‘group header
 	{
 		while ((buffer[mid_pos] != 0x00000001) && (mid_pos < len))
 		{
@@ -1696,7 +1731,7 @@ HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 
 		if (buffer[mid_pos + 1] == target_frame_num)
 		{
-			return HKA_STS_OK;     //ËÑË÷³É¹¦
+			return HKA_STS_OK;     //æœç´¢æˆåŠŸ
 		}
 
 		if (buffer[mid_pos + 1] > target_frame_num)
@@ -1735,7 +1770,7 @@ HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 		/*********************************************************************************/
 		else //((buffer[mid_pos + 1] < target_frame_num))
 		{
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½Ó½üÊ±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameæ¥è¿‘æ—¶
 			if (start == mid_pos)
 			{
 				int j = 0;
@@ -1759,7 +1794,7 @@ HKA_STATUS HKAFFG_Process_V8(unsigned int *buffer,
 					j++;
 				}
 			}
-			//µ±Ä¿±êframeºÍ¼ìË÷µ½µÄframe½ÏÔ¶Ê±
+			//å½“ç›®æ ‡frameå’Œæ£€ç´¢åˆ°çš„frameè¾ƒè¿œæ—¶
 
 			start = mid_pos;
 			start_frame_num = buffer[start + 1];
