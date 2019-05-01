@@ -4,6 +4,8 @@
 #define HKA_STS_ERR_BAD_ARG -1
 #define HKA_NULL NULL
 #define HKA_STS_OK 1
+#define HKA_STS_ERR 2
+
 
 #define HKA_S32 int
 #define HKA_U64 unsigned long
@@ -11,7 +13,7 @@
 #define HKA_U08 unsigned char
 #define HKA_STATUS int
 #define HCNN_VP6_FILTER_SAMPLE_DATA_DIM 4
-#define DType unsigned int
+#define DType int
 
 #define true 1
 #define false 0
@@ -25,87 +27,241 @@
 #define HKA_SIZE_ALIGN_64(size)      HKA_SIZE_ALIGN(size, 64)
 #define HKA_SIZE_ALIGN_128(size)     HKA_SIZE_ALIGN(size, 128)
 
+#define N_ID 0
+#define C_ID 1
+#define H_ID 2
+#define W_ID 3
 
 
-
-// Filter Sample ������ṹ�壬 ����NHWC��ʽ�洢����ͼ��
+// Filter Sample 层输入结构体， 采用NHWC形式存储输入图像
 typedef struct _HCNN_VP6_FILTERSAMPLE_LAYER_IN_T
 {
-	int shape[HCNN_VP6_FILTER_SAMPLE_DATA_DIM];     //����feature�洢
-	unsigned long input;                                      //����feature�洢�ĵ�ַ��ע�����ﲻ��ָ���ʾ                                   
-	unsigned int *table;                                      //����ӳ���
+	int shape[HCNN_VP6_FILTER_SAMPLE_DATA_DIM];     //输入feature存储
+	unsigned long input;                                      //输入feature存储的地址，注意这里不用指针表示                                   
+	unsigned int *table;                                      //采样映射表
 
 }HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T;
 
-// Filter Sample ������ṹ��
+// Filter Sample 层输出结构体
 typedef struct _HCNN_VP6_FILTERSAMPLE_LAYER_OUT_T
 {
-	int shape[HCNN_VP6_FILTER_SAMPLE_DATA_DIM];    //���feature�洢
-	unsigned long output;                                    //���feature�洢�ĵ�ַ��ע�����ﲻ��ָ���ʾ
-	int  DSP_RETURN;                                //DSP�Ĺ���״̬����
+	int shape[HCNN_VP6_FILTER_SAMPLE_DATA_DIM];    //输出feature存储
+	unsigned long output;                                    //输出feature存储的地址，注意这里不用指针表示
+	int  DSP_RETURN;                                //DSP的工作状态返回
 }HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T;
 
 
 /**********************************************************************************************************************
-* ��  �ܣ�C�汾ʵ�� elementwise����� ����
-* ��  ����fm_in        -I              ����feature map�Ȳ���
-*         fm_out       -O              �������
-* ����ֵ: ״̬��
+* 功  能：初始化fm_in的测试数据
+* 参  数：fm_in        -I              输入feature map等参数
+* 返回值: 状态码
 **********************************************************************************************************************/
-HKA_STATUS HCNN_Filter_Sample_Test_C(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in,	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+void Initial_Fm_in(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in)
 {
-	HKA_U32 C_bottom = fm_in->shape[3];
-	HKA_U32 C_top = fm_out->shape[3];
+	DType *buffer_in = (DType *)(fm_in->input);
+	HKA_U32 C_bottom = fm_in->shape[C_ID];
+	HKA_U32 n_filter_processing = C_bottom;
+	HKA_U32 max_index = n_filter_processing * fm_in->shape[N_ID] * fm_in->shape[H_ID] * fm_in->shape[W_ID];
+	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
+
+	//向input 写入数据
+	for (int index = 0; index < max_index; index++)
+	{
+		const int n = index / n_filter_processing / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+		const int j = n_res / n_filter_processing;                                            //j代表地址为index的数据落在第n张图片的第j个像素点
+		const int i = n_res % n_filter_processing;										      //i代表index地址的数据落在第j个像素点的第i个channel
+		const int n_bottom = i;                           
+		const int bottom_index = n * feat_size * C_bottom + j*C_bottom + n_bottom;
+		buffer_in[bottom_index] = i;                                                  //上采样                                   
+	}
+}
+
+
+/**********************************************************************************************************************
+* 功  能：分别以NHWC和NCHW的形式打印
+* 参  数：fm_in        -I              输入feature map等参数
+* 返回值: 状态码
+**********************************************************************************************************************/
+void Printf_NHWC(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in)
+{
+	DType *buffer_in = (DType *)(fm_in->input);
+
+	HKA_U32 C_bottom = fm_in->shape[C_ID];
+	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
+
+
+	////以NHWC形式打印
+	//for (int n = 0; n < fm_in->shape[N_ID]; n++)
+	//{
+	//	for (int h = 0; h < fm_in->shape[H_ID]; h++)
+	//	{
+	//		for (int w = 0; w < fm_in->shape[W_ID]; w++)
+	//		{
+	//			for (int c = 0; c < fm_in->shape[C_ID]; c++)
+	//			{
+	//				int index = n*feat_size*C_bottom + (h*fm_in->shape[W_ID] + w)*C_bottom + c;
+	//				printf("%d, ", buffer_in[index]);
+	//			}
+	//			printf("\n");
+	//		}
+	//	}
+	//}
+
+	//以NCHW形式打印数据
+	for (int n = 0; n < fm_in->shape[N_ID]; n++)
+	{
+		for (int c = 0; c < fm_in->shape[C_ID]; c++)
+		{
+			for (int h = 0; h < fm_in->shape[H_ID]; h++)
+			{
+				for (int w = 0; w < fm_in->shape[W_ID]; w++)
+				{
+					int index = n*feat_size*C_bottom + (h*fm_in->shape[W_ID] + w)*C_bottom + c;
+					printf("%d, ", buffer_in[index]);
+				}
+				printf("\n");
+			}
+		}
+	}
+
+}
+
+
+/**********************************************************************************************************************
+* 功  能：检查filter sample处理结果
+* 参  数：fm_in        -I              输入feature map等参数
+*         fm_out       -O              输出参数
+* 返回值: 状态码
+**********************************************************************************************************************/
+HKA_STATUS HCNN_Filter_Sample_Check(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in, HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+{
+	DType *buffer_in = (DType *)(fm_in->input);
+	DType *buffer_out = (DType *)(fm_out->output);
+
+	HKA_U32 C_bottom = fm_in->shape[C_ID];
+	HKA_U32 C_top = fm_out->shape[C_ID];
+
+	HKA_U32 n_filter_processing = (C_bottom > C_top) ? C_top : C_bottom;
+	HKA_U32 max_index = n_filter_processing * fm_in->shape[N_ID] * fm_in->shape[H_ID] * fm_in->shape[W_ID];
+	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
+	int tag_upsample = (C_bottom > C_top) ? false : true;
+
+	for (int index = 0; index < max_index; index++)
+	{
+		const int n = index / n_filter_processing / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+		const int j = n_res / n_filter_processing;                                            //j代表地址为index的数据落在第n张图片的第j个像素点
+		const int i = n_res % n_filter_processing;										     //i代表index地址的数据落在第j个像素点的第i个channel
+		const int n_bottom = tag_upsample == true ? i : fm_in->table[i];                            //j
+		const int n_top = tag_upsample == false ? i : fm_in->table[i];                               //table[j]
+		const int bottom_index = n * feat_size * C_bottom + j*C_bottom + n_bottom;
+		const int top_index = n * feat_size * C_top + j * C_top + n_top;
+
+		if (buffer_out[top_index] != buffer_in[bottom_index])                                                  //上采样                                   
+		{
+			printf("Error in fm_out[%d] and fm_in[%d]\n", top_index, bottom_index);
+			return HKA_STS_ERR;
+		}
+	}
+
+	Printf_NHWC(fm_out);
+
+}
+
+
+/**********************************************************************************************************************
+* 功  能：C版本实现 filter sample
+* 参  数：fm_in        -I              输入feature map等参数
+*         fm_out       -O              输出参数
+* 返回值: 状态码
+**********************************************************************************************************************/
+HKA_STATUS HCNN_Filter_Sample_Test_C_NHWC(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in, HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+{
+	DType *buffer_in = (DType *)(fm_in->input);
+	DType *buffer_out = (DType *)(fm_out->output);
+
+	HKA_U32 C_bottom = fm_in->shape[C_ID];
+	HKA_U32 C_top = fm_out->shape[C_ID];
+
+	HKA_U32 n_filter_processing = (C_bottom > C_top) ? C_top : C_bottom;
+	HKA_U32 max_index = n_filter_processing * fm_in->shape[N_ID] * fm_in->shape[H_ID] * fm_in->shape[W_ID];
+	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
+	int tag_upsample = (C_bottom > C_top) ? false : true;
+
+	for (int index = 0; index < max_index; index++)
+	{
+		const int n = index / n_filter_processing / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+		const int j = n_res / n_filter_processing;                                            //j代表地址为index的数据落在第n张图片的第j个像素点
+		const int i = n_res % n_filter_processing;										     //i代表index地址的数据落在第j个像素点的第i个channel
+		const int n_bottom = tag_upsample == true ? i : fm_in->table[i];                            //j
+		const int n_top = tag_upsample == false ? i : fm_in->table[i];                               //table[j]
+		const int bottom_index = n * feat_size * C_bottom + j*C_bottom + n_bottom;
+		const int top_index = n * feat_size * C_top + j * C_top + n_top;
+
+		buffer_out[top_index] = buffer_in[bottom_index];                                                  //上采样                                   
+	}
+
+	Printf_NHWC(fm_out);
+
+}
+
+
+
+HKA_STATUS HCNN_Filter_Sample_Test_C_NCHW(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in, HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+{
+	DType *buffer_in = (DType *)(fm_in->input);
+	DType *buffer_out = (DType *)(fm_out->output);
+
+	HKA_U32 C_bottom = fm_in->shape[C_ID];
+	HKA_U32 C_top = fm_out->shape[C_ID];
 
 	HKA_U32 n_filter_processing = C_bottom > C_top ? C_top : C_bottom;
-	HKA_U32 max_index = n_filter_processing * fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2];
-	HKA_U32 feat_size = fm_in->shape[1] * fm_in->shape[2];
+	HKA_U32 max_index = n_filter_processing * fm_in->shape[N_ID] * fm_in->shape[H_ID] * fm_in->shape[W_ID];
+	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
 	int tag_upsample = C_bottom > C_top ? false : true;
 
 	for (int index = 0; index < max_index; index++)
 	{
-		const int n = index / n_filter_processing / feat_size;                                //n������ַΪindex����������batch_size�еĵ�n��ͼƬ
-		const int n_res = index % (n_filter_processing * feat_size);						  //n_res������ַΪindex���������ڵ�n��ͼƬ������feature map�����еĵ�n_res����
-		const int j = n_res / feat_size;                                                      //j������ַΪindex���������ڵ�n��ͼƬ�ĵ�j��feature map
-		const int i = n_res % feat_size;													  //i����index��ַ���������ڵ�j��feature map �еĵ�i������
+		const int n = index / n_filter_processing / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+		const int j = n_res / feat_size;                                                      //j代表地址为index的数据落在第n张图片的第j张feature map
+		const int i = n_res % feat_size;													  //i代表index地址的数据落在第j张feature map 中的第i个像素
 		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
 		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
 		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
 		const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
 
-		*((DType *)(fm_out->output + top_index)) = *((DType *)(fm_in->input + bottom_index));                                                  //�ϲ���                                   
-
+		buffer_out[top_index] = buffer_in[bottom_index];                                                  //上采样                                   
 	}
 }
 
 /***********************************************************************************************************************
-* ��  �ܣ�����ģ��������ڴ�Ĵ�С
-* ��  ����*
-*         data_in             - I    �������ݵ�ַ
-*         data_out            - I    ������ݵ�ַ
-*         alloc_size          - O    ����ģ�������ڴ��С
-* ����ֵ��״̬��
-* ��ע��
+* 功  能：计算模块所需的内存的大小
+* 参  数：*
+*         data_in             - I    输入数据地址
+*         data_out            - I    输出数据地址
+*         alloc_size          - O    返回模块所需内存大小
+* 返回值：状态码
+* 备注：
 ***********************************************************************************************************************/
 HKA_STATUS HCNN_ARM_Filter_Sample_GetMemSize(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T data_in,
 	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T data_out,
 	HKA_U32 *alloc_size)
 {
-	//if ((data_in == HKA_NULL) || (data_out == HKA_NULL) || (data_out == HKA_NULL))
-	//{
-	//	return HKA_STS_ERR_BAD_ARG;
-	//}
-	// ��������С
+
+	// 各参数大小
 	HKA_U32  input_size = 0;
 	HKA_U32  output_size = 0;
 
-	//���������ڴ��С
-	input_size += HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));                                                     //��������ṹ��Ĵ�С
-	input_size += HKA_SIZE_ALIGN_64(sizeof(DType)*(data_in.shape[0] * data_in.shape[1] * data_in.shape[2] * data_in.shape[3]));     //��������ṹ���е�����ͼ��Ĵ�С
-	input_size += HKA_SIZE_ALIGN_64(sizeof(HKA_U32)*((data_in.shape[3] > data_out.shape[3]) ? data_out.shape[3] : data_in.shape[3]));     //����ӳ����Ĵ�С
-	//��������ڴ��С
-	output_size += HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));                                                    //��������ṹ��Ĵ�С
-	output_size += HKA_SIZE_ALIGN_64(sizeof(DType)*(data_out.shape[0] * data_out.shape[1] * data_out.shape[2] * data_out.shape[3])); //����ṹ���ص����ͼ���С
+	//输入所需内存大小
+	input_size += HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));         //64B                                                //输入参数结构体的大小
+	input_size += HKA_SIZE_ALIGN_64(sizeof(DType)*(data_in.shape[0] * data_in.shape[1] * data_in.shape[2] * data_in.shape[3]));     //2112=64+2048输入参数结构体中的输入图像的大小
+	input_size += HKA_SIZE_ALIGN_64(sizeof(HKA_U32)*((data_in.shape[1] > data_out.shape[1]) ? data_out.shape[1] : data_in.shape[1]));     //采样映射表的大小
+	//输出所需内存大小
+	output_size += HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));                                                    //输出参数结构体的大小
+	output_size += HKA_SIZE_ALIGN_64(sizeof(DType)*(data_out.shape[0] * data_out.shape[1] * data_out.shape[2] * data_out.shape[3])); //输出结构体重的输出图像大小
 	*alloc_size = input_size + output_size;
 
 	printf("input_size = %d\n", input_size);
@@ -117,13 +273,13 @@ HKA_STATUS HCNN_ARM_Filter_Sample_GetMemSize(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T d
 
 
 /***********************************************************************************************************************
-* ��  �ܣ�����ģ�������ڴ�
-* ��  ����*
-*         data_in             - I    �������ݵ�ַ
-*         data_out            - I    ������ݵ�ַ
-*         alloc_size          - O    ����ģ�������ڴ��С
-* ����ֵ��״̬��
-* ��ע��
+* 功  能：分配模块所需内存
+* 参  数：*
+*         data_in             - I    输入数据地址
+*         data_out            - I    输出数据地址
+*         alloc_size          - O    返回模块所需内存大小
+* 返回值：状态码
+* 备注：
 ***********************************************************************************************************************/
 HKA_STATUS HCNN_ARM_Filter_Sample_Create(HKA_U08 *data_in,
 	HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *fm_in,
@@ -131,107 +287,99 @@ HKA_STATUS HCNN_ARM_Filter_Sample_Create(HKA_U08 *data_in,
 	HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T **param_in_addr,
 	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T **param_out_addr)
 {
-	*param_in_addr = (HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *)data_in;
-	int a = (HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *)data_in;
-	int b = HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));                                                                                      //�洢����ͼƬ�ĵ�ַ
-	fm_in->input = a + b;   
-                                                                                   //�洢����ͼƬ�ĵ�ַ
-	a = fm_in->input;
-	b = HKA_SIZE_ALIGN_64(sizeof(DType)*(fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2] * fm_in->shape[3]));
-	fm_in->table = a + b;             //�洢����ӳ���table�ĵ�ַ     
+	int addr = 0;
+	int used_size = 0;
 
-	*param_out_addr = (HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *)(fm_in->table + HKA_SIZE_ALIGN_64(((fm_in->shape[3] > fm_out->shape[3]) ? fm_out->shape[3] : fm_in->shape[3])*sizeof(HKA_U32)));   //����ṹ���ַ
-	a = *param_out_addr;
-	b = HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));
-	fm_out->output = a + b;
+	*param_in_addr = (HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *)data_in;
+
+	addr = (HKA_U08 *)data_in;
+	used_size = HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));                                                                                      //存储输入图片的地址
+	fm_in->input = addr + used_size; //存储输入图片的地址
+
+	addr += used_size;
+	used_size = HKA_SIZE_ALIGN_64(sizeof(DType)*(fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2] * fm_in->shape[3]));
+	fm_in->table = addr + used_size;          //存储采样映射表table的地址   
+
+	addr += used_size;
+	used_size = HKA_SIZE_ALIGN_64(((fm_in->shape[C_ID] > fm_out->shape[C_ID]) ? fm_out->shape[C_ID] : fm_in->shape[C_ID])*sizeof(HKA_U32));
+	*param_out_addr = addr + used_size;      //输出结构体地址
+
+	addr += used_size;
+	used_size = HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));
+	fm_out->output = addr + used_size;
+
 	return 1;
 }
 
 
-void write_mem(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *fm_in, HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
-{
-	DType *buffer_in = (DType *)(fm_in->input);
-	DType *buffer_out = (DType *)(fm_out->output);
-
-	HKA_U32 C_bottom = fm_in->shape[3];
-	HKA_U32 C_top = fm_out->shape[3];
-
-	HKA_U32 n_filter_processing = C_bottom > C_top ? C_top : C_bottom;
-	HKA_U32 max_index = n_filter_processing * fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2];
-	HKA_U32 feat_size = fm_in->shape[2] * fm_in->shape[3];
-	int tag_upsample = C_bottom > C_top ? false : true;
-
-
-	HKA_U32 max_input_index = fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2] * fm_in->shape[3];
-	HKA_U32 max_output_index = fm_out->shape[0] * fm_out->shape[1] * fm_out->shape[2] * fm_out->shape[3];
-
-
-
-	for (int index = 0; index < max_input_index; index++)
-	{
-		const int n = index / C_bottom / feat_size;                                //n������ַΪindex����������batch_size�еĵ�n��ͼƬ
-		const int n_res = index % (C_bottom * feat_size);						  //n_res������ַΪindex���������ڵ�n��ͼƬ������feature map�����еĵ�n_res����
-		const int j = n_res / feat_size;                                                      //j������ַΪindex���������ڵ�n��ͼƬ�ĵ�j��feature map
-		const int i = n_res % feat_size;													  //i����index��ַ���������ڵ�j��feature map �еĵ�i������
-		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
-		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
-		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
-		//const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
-
-		buffer_in[bottom_index] = j;                                                  //�ϲ���                                   
-	}
-	for (int i = 0; i < fm_in->shape[0]; i++)
-	{
-		int picture_size = 500 * i;
-		for (int j = 0; j < fm_in->shape[1]; j++)
-		{
-			int channel_size = 100 * j;
-			for (int k = 0; k < fm_in->shape[2]; k++)
-			{
-				int row_size = k * 10;
-				for (int l = 0; l < fm_in->shape[3]; l++)
-				{
-					printf("%d, ", buffer_in[picture_size + channel_size + row_size + l]);
-				}
-				printf("\n");
-			}
-		}
-	}
-	
-
-	for (int index = 0; index < max_index; index++)
-	{
-		const int n = index / n_filter_processing / feat_size;                                //n������ַΪindex����������batch_size�еĵ�n��ͼƬ
-		const int n_res = index % (n_filter_processing * feat_size);						  //n_res������ַΪindex���������ڵ�n��ͼƬ������feature map�����еĵ�n_res����
-		const int j = n_res / feat_size;                                                      //j������ַΪindex���������ڵ�n��ͼƬ�ĵ�j��feature map
-		const int i = n_res % feat_size;													  //i����index��ַ���������ڵ�j��feature map �еĵ�i������
-		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
-		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
-		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
-		const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
-
-		buffer_out[top_index] = buffer_in[bottom_index];                                                  //�ϲ���                                   
-	}
-
-	for (int i = 0; i < fm_out->shape[0]; i++)
-	{
-		int picture_size = 500 * i;
-		for (int j = 0; j < fm_out->shape[1]; j++)
-		{
-			int channel_size = 100 * j;
-			for (int k = 0; k < fm_out->shape[2]; k++)
-			{
-				int row_size = k * 10;
-				for (int l = 0; l < fm_out->shape[3]; l++)
-				{
-					printf("%d, ", buffer_out[picture_size + channel_size + row_size + l]);
-				}
-				printf("\n");
-			}
-		}
-	}
-
-}
+//void write_mem(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *fm_in, HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+//{
+//	DType *buffer_in = (DType *)(fm_in->input);
+//	DType *buffer_out = (DType *)(fm_out->output);
+//
+//	HKA_U32 C_bottom = fm_in->shape[1];
+//	HKA_U32 C_top = fm_out->shape[1];
+//
+//	HKA_U32 n_filter_processing = C_bottom > C_top ? C_top : C_bottom;
+//	HKA_U32 max_index = n_filter_processing * fm_in->shape[N_ID] * fm_in->shape[H_ID] * fm_in->shape[W_ID];
+//	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
+//	int tag_upsample = C_bottom > C_top ? false : true;
+//
+//
+//	HKA_U32 max_input_index = fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2] * fm_in->shape[3];
+//	HKA_U32 max_output_index = fm_out->shape[0] * fm_out->shape[1] * fm_out->shape[2] * fm_out->shape[3];
+//
+//
+//
+//	for (int index = 0; index < max_input_index; index++)
+//	{
+//		const int n = index / C_bottom / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+//		const int n_res = index % (C_bottom * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+//		const int j = n_res / feat_size;                                                      //j代表地址为index的数据落在第n张图片的第j张feature map
+//		const int i = n_res % feat_size;													  //i代表index地址的数据落在第j张feature map 中的第i个像素
+//		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
+//		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
+//		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
+//		//const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
+//		buffer_in[bottom_index] = j;                                                  //上采样                                   
+//	}
+//	for (int i = 0; i < fm_in->shape[0]; i++)
+//	{
+//		int picture_size = 500 * i;
+//		for (int j = 0; j < fm_in->shape[1]; j++)
+//		{
+//			int channel_size = 100 * j;
+//			for (int k = 0; k < fm_in->shape[2]; k++)
+//			{
+//				int row_size = k * 10;
+//				for (int l = 0; l < fm_in->shape[3]; l++)
+//				{
+//					printf("%d, ", buffer_in[picture_size + channel_size + row_size + l]);
+//				}
+//				printf("\n");
+//			}
+//		}
+//	}
+//
+//	HCNN_Filter_Sample_Test_C(fm_in, fm_out);
+//	for (int i = 0; i < fm_out->shape[0]; i++)
+//	{
+//		int picture_size = 500 * i;
+//		for (int j = 0; j < fm_out->shape[1]; j++)
+//		{
+//			int channel_size = 100 * j;
+//			for (int k = 0; k < fm_out->shape[2]; k++)
+//			{
+//				int row_size = k * 10;
+//				for (int l = 0; l < fm_out->shape[3]; l++)
+//				{
+//					printf("%d, ", buffer_out[picture_size + channel_size + row_size + l]);
+//				}
+//				printf("\n");
+//			}
+//		}
+//	}
+//}
 
 
 void main()
@@ -247,39 +395,452 @@ void main()
 	fm_in.shape[2] = 10;
 	fm_in.shape[3] = 10;
 
-	
+
 	fm_out.shape[0] = 1;
 	fm_out.shape[1] = 25;
 	fm_out.shape[2] = 10;
 	fm_out.shape[3] = 10;
-	
+
 	printf("%d\n", fm_in.input);
 	printf("%d\n", param_in);
 
 	HKA_U08   *data_in = NULL;
-	
+
 	unsigned int u32BodyLen;
 	HCNN_ARM_Filter_Sample_GetMemSize(fm_in, fm_out, &u32BodyLen);
 
-	// ������������ڴ�
+	// 输入输出申请内存
 	data_in = (HKA_U08 *)malloc(u32BodyLen);
 
-	// �����ڴ沢��ֵ
+	// 分配内存并赋值
 	HCNN_ARM_Filter_Sample_Create(data_in, &fm_in, &fm_out, &param_in, &param_out);
 	for (int i = 0; i < 5; i++)
 	{
-		fm_in.table[i] = 2 * i;
+		fm_in.table[i] = 5 * i;
 	}
 
-		// ����������ṹ�帴�Ƶ������ڴ��У����ں��� DSP �˽���
+	// 将输入输出结构体复制到参数内存中，用于后续 DSP 端解析
 	memcpy((void *)(param_in), (void *)(&fm_in), sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));
 	memcpy((void *)(param_out), (void *)(&fm_out), sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));
-	
-	memset(param_in->input, 0, 10000);
 
-	write_mem(param_in, param_out);
+	int out_size = param_out->shape[C_ID] * param_out->shape[N_ID] * param_out->shape[H_ID] * param_out->shape[W_ID];
 
+	memset(param_out->output, 0, out_size*sizeof(DType));
+	//初始化测试参数
+	Initial_Fm_in(param_in);
+	//执行C语言版本filter sample
+	HCNN_Filter_Sample_Test_C_NHWC(param_in, param_out);
+	//检查测试结果
+	HKA_STATUS sts = HCNN_Filter_Sample_Check(param_in, param_out);
+	if (sts != HKA_STS_OK)
+	{
+		printf("Failed\n");
+	}
 	system("pause");
 	//printf("%d\n", fm_in.input);
 	//printf("%d\n", param_in);
 }
+
+
+//#include <stdio.h>
+//
+//void main()
+//{
+//	//char a[100][100];
+//	int **a = (int **)malloc((sizeof(int *)) * 100);
+//	for (int i = 0; i < 100; i++)
+//	{
+//		a[i] = (int *)malloc(sizeof(int)*100);
+//	}
+//
+//	//to do
+//
+//
+//	for (int i=0; i < 100; i++)
+//	{
+//		free(a[i]);
+//	}
+//
+//	free(a);
+//
+//
+//	printf("size is %d", sizeof(a[2]));
+//	system("pause");
+//}
+
+//
+//void binary_search(unsigned int *buffer, unsigned int target_frame_num, long len)
+//{
+//	int start = 0;
+//	int end = len - 1;
+//
+//	if(len == 1)  //如果只有一个group的情况
+//	{
+//		return;
+//	}
+//
+//	//start end 记录的是第一个group 和最后一个group的起始地址
+//
+//	unsigned int start_num = 0;
+//	unsigned int end_num = 99;
+//	long gap = (end-start) / (end_num - start_num);
+//	long mid_pos = (target_frame_num - start_num)*gap + start;
+//
+//	while (start>=end)						//start 和 end 开始一直指向group header
+//	{
+//		while ((buffer[mid_pos] != 0xA) && (mid_pos >=len))
+//		{
+//			mid_pos++;
+//		}
+//		if (mid_pos >=len)
+//		{
+//			return;
+//		}
+//
+//		if (buffer[mid_pos + 1] == target_frame_num)
+//		{
+//			return;     //搜索成功
+//		}
+//
+//		if (buffer[mid_pos + 1] > target_frame_num)
+//		{
+//			if (buffer[mid_pos + 1] == end_num)      //特殊情况处理，当每次二分之后向后巡第一个group都是同一个的话，mid_pos的位置需要向左移动
+//			{
+//				end--;
+//			}
+//			else
+//			{
+//				end_num = buffer[mid_pos + 1];
+//				end = mid_pos;
+//			}
+//			gap = (end - start) / (end_num - start_num);
+//			mid_pos = (target_frame_num - start_num)*gap + start;
+//		}
+//
+//		if ((buffer[mid_pos + 1] < target_frame_num))
+//		{
+//			start_num = buffer[mid_pos + 1];
+//			start = mid_pos;
+//			gap = (end - start) / (end_num - start_num);
+//			mid_pos = (target_frame_num - start_num)*gap + start;
+//		}
+//	}
+//	return;  //搜索失败
+//
+//}
+//
+//
+//
+//
+//
+//
+//void main()
+//{
+//	register 
+//	_int8 *buffer = (char *)malloc(sizeof(_int8)*1000);
+//	printf("%d", sizeof(buffer));
+//	char a[3] = { 1, 1, 1 };
+//	unsigned int *b = (unsigned int *)a;
+//	printf("%d", *b);
+//	system("pause");
+//	//FILE *fp=NULL;
+//	//fopen("my_pass.txt", fp, 'r');
+//	//fseek(fp, 0, SEEK_END); //定位到文件末 
+//	//int nFileLen = 0;
+//	//nFileLen = ftell(fp); //文件长度
+//	//scanf("%d", &nFileLen);
+//}
+
+
+
+
+
+
+
+
+
+//#include <stdio.h>
+//#include <Windows.h>
+//
+//#define HKA_STS_ERR_BAD_ARG -1
+//#define HKA_NULL NULL
+//#define HKA_STS_OK 1
+//
+//#define HKA_S32 int
+//#define HKA_U64 unsigned long
+//#define HKA_U32 unsigned int
+//#define HKA_U08 unsigned char
+//#define HKA_STATUS int
+//#define HCNN_VP6_FILTER_SAMPLE_DATA_DIM 4
+//#define DType unsigned int
+//
+//#define true 1
+//#define false 0
+//
+//
+//#define HKA_SIZE_ALIGN(size, align)  (((size) + ((align) - 1)) & (~((align) - 1)))
+//#define HKA_SIZE_ALIGN_4(size)       HKA_SIZE_ALIGN(size, 4)
+//#define HKA_SIZE_ALIGN_8(size)       HKA_SIZE_ALIGN(size, 8)
+//#define HKA_SIZE_ALIGN_16(size)      HKA_SIZE_ALIGN(size, 16)
+//#define HKA_SIZE_ALIGN_32(size)      HKA_SIZE_ALIGN(size, 32)
+//#define HKA_SIZE_ALIGN_64(size)      HKA_SIZE_ALIGN(size, 64)
+//#define HKA_SIZE_ALIGN_128(size)     HKA_SIZE_ALIGN(size, 128)
+//
+//
+//
+//
+//// Filter Sample 层输入结构体， 采用NHWC形式存储输入图像
+//typedef struct _HCNN_VP6_FILTERSAMPLE_LAYER_IN_T
+//{
+//	int shape[HCNN_VP6_FILTER_SAMPLE_DATA_DIM];     //输入feature存储
+//	unsigned long input;                                      //输入feature存储的地址，注意这里不用指针表示                                   
+//	unsigned int *table;                                      //采样映射表
+//
+//}HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T;
+//
+//// Filter Sample 层输出结构体
+//typedef struct _HCNN_VP6_FILTERSAMPLE_LAYER_OUT_T
+//{
+//	int shape[HCNN_VP6_FILTER_SAMPLE_DATA_DIM];    //输出feature存储
+//	unsigned long output;                                    //输出feature存储的地址，注意这里不用指针表示
+//	int  DSP_RETURN;                                //DSP的工作状态返回
+//}HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T;
+//
+//
+///**********************************************************************************************************************
+//* 功  能：C版本实现 elementwise计算的 函数
+//* 参  数：fm_in        -I              输入feature map等参数
+//*         fm_out       -O              输出参数
+//* 返回值: 状态码
+//**********************************************************************************************************************/
+//HKA_STATUS HCNN_Filter_Sample_Test_C(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in,	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+//{
+//	HKA_U32 C_bottom = fm_in->shape[3];
+//	HKA_U32 C_top = fm_out->shape[3];
+//
+//	HKA_U32 n_filter_processing = C_bottom > C_top ? C_top : C_bottom;
+//	HKA_U32 max_index = n_filter_processing * fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2];
+//	HKA_U32 feat_size = fm_in->shape[1] * fm_in->shape[2];
+//	int tag_upsample = C_bottom > C_top ? false : true;
+//
+//	for (int index = 0; index < max_index; index++)
+//	{
+//		const int n = index / n_filter_processing / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+//		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+//		const int j = n_res / feat_size;                                                      //j代表地址为index的数据落在第n张图片的第j张feature map
+//		const int i = n_res % feat_size;													  //i代表index地址的数据落在第j张feature map 中的第i个像素
+//		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
+//		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
+//		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
+//		const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
+//
+//		*((DType *)(fm_out->output + top_index)) = *((DType *)(fm_in->input + bottom_index));                                                  //上采样                                   
+//
+//	}
+//}
+//
+///***********************************************************************************************************************
+//* 功  能：计算模块所需的内存的大小
+//* 参  数：*
+//*         data_in             - I    输入数据地址
+//*         data_out            - I    输出数据地址
+//*         alloc_size          - O    返回模块所需内存大小
+//* 返回值：状态码
+//* 备注：
+//***********************************************************************************************************************/
+//HKA_STATUS HCNN_ARM_Filter_Sample_GetMemSize(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T data_in,
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T data_out,
+//	HKA_U32 *alloc_size)
+//{
+//	//if ((data_in == HKA_NULL) || (data_out == HKA_NULL) || (data_out == HKA_NULL))
+//	//{
+//	//	return HKA_STS_ERR_BAD_ARG;
+//	//}
+//	// 各参数大小
+//	HKA_U32  input_size = 0;
+//	HKA_U32  output_size = 0;
+//
+//	//输入所需内存大小
+//	input_size += HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));                                                     //输入参数结构体的大小
+//	input_size += HKA_SIZE_ALIGN_64(sizeof(DType)*(data_in.shape[0] * data_in.shape[1] * data_in.shape[2] * data_in.shape[3]));     //输入参数结构体中的输入图像的大小
+//	input_size += HKA_SIZE_ALIGN_64(sizeof(HKA_U32)*((data_in.shape[3] > data_out.shape[3]) ? data_out.shape[3] : data_in.shape[3]));     //采样映射表的大小
+//	//输出所需内存大小
+//	output_size += HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));                                                    //输出参数结构体的大小
+//	output_size += HKA_SIZE_ALIGN_64(sizeof(DType)*(data_out.shape[0] * data_out.shape[1] * data_out.shape[2] * data_out.shape[3])); //输出结构体重的输出图像大小
+//	*alloc_size = input_size + output_size;
+//
+//	printf("input_size = %d\n", input_size);
+//	printf("output_size  = %d\n", output_size);
+//	printf("total_size   = %d\n", *alloc_size);
+//	return HKA_STS_OK;
+//}
+//
+//
+//
+///***********************************************************************************************************************
+//* 功  能：分配模块所需内存
+//* 参  数：*
+//*         data_in             - I    输入数据地址
+//*         data_out            - I    输出数据地址
+//*         alloc_size          - O    返回模块所需内存大小
+//* 返回值：状态码
+//* 备注：
+//***********************************************************************************************************************/
+//HKA_STATUS HCNN_ARM_Filter_Sample_Create(HKA_U08 *data_in,
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *fm_in,
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out,
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T **param_in_addr,
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T **param_out_addr)
+//{
+//	*param_in_addr = (HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *)data_in;
+//	int a = (HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *)data_in;
+//	int b = HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));                                                                                      //存储输入图片的地址
+//	fm_in->input = a + b;   
+//                                                                                   //存储输入图片的地址
+//	a = fm_in->input;
+//	b = HKA_SIZE_ALIGN_64(sizeof(DType)*(fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2] * fm_in->shape[3]));
+//	fm_in->table = a + b;             //存储采样映射表table的地址     
+//
+//	*param_out_addr = (HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *)(fm_in->table + HKA_SIZE_ALIGN_64(((fm_in->shape[3] > fm_out->shape[3]) ? fm_out->shape[3] : fm_in->shape[3])*sizeof(HKA_U32)));   //输出结构体地址
+//	a = *param_out_addr;
+//	b = HKA_SIZE_ALIGN_64(sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));
+//	fm_out->output = a + b;
+//	return 1;
+//}
+//
+//
+//void write_mem(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *fm_in, HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *fm_out)
+//{
+//	DType *buffer_in = (DType *)(fm_in->input);
+//	DType *buffer_out = (DType *)(fm_out->output);
+//
+//	HKA_U32 C_bottom = fm_in->shape[3];
+//	HKA_U32 C_top = fm_out->shape[3];
+//
+//	HKA_U32 n_filter_processing = C_bottom > C_top ? C_top : C_bottom;
+//	HKA_U32 max_index = n_filter_processing * fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2];
+//	HKA_U32 feat_size = fm_in->shape[2] * fm_in->shape[3];
+//	int tag_upsample = C_bottom > C_top ? false : true;
+//
+//
+//	HKA_U32 max_input_index = fm_in->shape[0] * fm_in->shape[1] * fm_in->shape[2] * fm_in->shape[3];
+//	HKA_U32 max_output_index = fm_out->shape[0] * fm_out->shape[1] * fm_out->shape[2] * fm_out->shape[3];
+//
+//
+//
+//	for (int index = 0; index < max_input_index; index++)
+//	{
+//		const int n = index / C_bottom / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+//		const int n_res = index % (C_bottom * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+//		const int j = n_res / feat_size;                                                      //j代表地址为index的数据落在第n张图片的第j张feature map
+//		const int i = n_res % feat_size;													  //i代表index地址的数据落在第j张feature map 中的第i个像素
+//		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
+//		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
+//		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
+//		//const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
+//
+//		buffer_in[bottom_index] = j;                                                  //上采样                                   
+//	}
+//	for (int i = 0; i < fm_in->shape[0]; i++)
+//	{
+//		int picture_size = 500 * i;
+//		for (int j = 0; j < fm_in->shape[1]; j++)
+//		{
+//			int channel_size = 100 * j;
+//			for (int k = 0; k < fm_in->shape[2]; k++)
+//			{
+//				int row_size = k * 10;
+//				for (int l = 0; l < fm_in->shape[3]; l++)
+//				{
+//					printf("%d, ", buffer_in[picture_size + channel_size + row_size + l]);
+//				}
+//				printf("\n");
+//			}
+//		}
+//	}
+//	
+//
+//	for (int index = 0; index < max_index; index++)
+//	{
+//		const int n = index / n_filter_processing / feat_size;                                //n代表地址为index的数据落在batch_size中的第n张图片
+//		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
+//		const int j = n_res / feat_size;                                                      //j代表地址为index的数据落在第n张图片的第j张feature map
+//		const int i = n_res % feat_size;													  //i代表index地址的数据落在第j张feature map 中的第i个像素
+//		const int n_bottom = tag_upsample == true ? j : fm_in->table[j];                            //j
+//		const int n_top = tag_upsample == false ? j : fm_in->table[j];                               //table[j]
+//		const int bottom_index = n * feat_size * C_bottom + feat_size * n_bottom + i;
+//		const int top_index = n * feat_size * C_top + feat_size *    n_top + i;
+//
+//		buffer_out[top_index] = buffer_in[bottom_index];                                                  //上采样                                   
+//	}
+//
+//	for (int i = 0; i < fm_out->shape[0]; i++)
+//	{
+//		int picture_size = 500 * i;
+//		for (int j = 0; j < fm_out->shape[1]; j++)
+//		{
+//			int channel_size = 100 * j;
+//			for (int k = 0; k < fm_out->shape[2]; k++)
+//			{
+//				int row_size = k * 10;
+//				for (int l = 0; l < fm_out->shape[3]; l++)
+//				{
+//					printf("%d, ", buffer_out[picture_size + channel_size + row_size + l]);
+//				}
+//				printf("\n");
+//			}
+//		}
+//	}
+//
+//}
+//
+//
+//void main()
+//{
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T fm_in;
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T *param_in = NULL;
+//
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T fm_out;
+//	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *param_out = NULL;
+//
+//	fm_in.shape[0] = 1;
+//	fm_in.shape[1] = 5;
+//	fm_in.shape[2] = 10;
+//	fm_in.shape[3] = 10;
+//
+//	
+//	fm_out.shape[0] = 1;
+//	fm_out.shape[1] = 25;
+//	fm_out.shape[2] = 10;
+//	fm_out.shape[3] = 10;
+//	
+//	printf("%d\n", fm_in.input);
+//	printf("%d\n", param_in);
+//
+//	HKA_U08   *data_in = NULL;
+//	
+//	unsigned int u32BodyLen;
+//	HCNN_ARM_Filter_Sample_GetMemSize(fm_in, fm_out, &u32BodyLen);
+//
+//	// 输入输出申请内存
+//	data_in = (HKA_U08 *)malloc(u32BodyLen);
+//
+//	// 分配内存并赋值
+//	HCNN_ARM_Filter_Sample_Create(data_in, &fm_in, &fm_out, &param_in, &param_out);
+//	for (int i = 0; i < 5; i++)
+//	{
+//		fm_in.table[i] = 2 * i;
+//	}
+//
+//		// 将输入输出结构体复制到参数内存中，用于后续 DSP 端解析
+//	memcpy((void *)(param_in), (void *)(&fm_in), sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T));
+//	memcpy((void *)(param_out), (void *)(&fm_out), sizeof(HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T));
+//	
+//	memset(param_in->input, 0, 10000);
+//
+//	write_mem(param_in, param_out);
+//
+//	system("pause");
+//	//printf("%d\n", fm_in.input);
+//	//printf("%d\n", param_in);
+//}
