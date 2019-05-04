@@ -52,7 +52,7 @@ typedef struct _HCNN_VP6_FILTERSAMPLE_LAYER_OUT_T
 
 
 /**********************************************************************************************************************
-* 功  能：初始化fm_in的测试数据
+* 功  能：初始化fm_in的测试数据, 以NHWC的方式写入数据
 * 参  数：fm_in        -I              输入feature map等参数
 * 返回值: 状态码
 **********************************************************************************************************************/
@@ -71,9 +71,9 @@ void Initial_Fm_in(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in)
 		const int n_res = index % (n_filter_processing * feat_size);						  //n_res代表地址为index的数据落在第n张图片中所有feature map数据中的第n_res个点
 		const int j = n_res / n_filter_processing;                                            //j代表地址为index的数据落在第n张图片的第j个像素点
 		const int i = n_res % n_filter_processing;										      //i代表index地址的数据落在第j个像素点的第i个channel
-		const int n_bottom = i;                           
+		const int n_bottom = i;
 		const int bottom_index = n * feat_size * C_bottom + j*C_bottom + n_bottom;
-		buffer_in[bottom_index] = i;                                                  //上采样                                   
+		buffer_in[bottom_index] = i*(n + 1);                                                  //上采样                                   
 	}
 }
 
@@ -91,22 +91,22 @@ void Printf_NHWC(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in)
 	HKA_U32 feat_size = fm_in->shape[H_ID] * fm_in->shape[W_ID];
 
 
-	////以NHWC形式打印
-	//for (int n = 0; n < fm_in->shape[N_ID]; n++)
-	//{
-	//	for (int h = 0; h < fm_in->shape[H_ID]; h++)
-	//	{
-	//		for (int w = 0; w < fm_in->shape[W_ID]; w++)
-	//		{
-	//			for (int c = 0; c < fm_in->shape[C_ID]; c++)
-	//			{
-	//				int index = n*feat_size*C_bottom + (h*fm_in->shape[W_ID] + w)*C_bottom + c;
-	//				printf("%d, ", buffer_in[index]);
-	//			}
-	//			printf("\n");
-	//		}
-	//	}
-	//}
+	//以NHWC形式打印
+	for (int n = 0; n < fm_in->shape[N_ID]; n++)
+	{
+		for (int h = 0; h < fm_in->shape[H_ID]; h++)
+		{
+			for (int w = 0; w < fm_in->shape[W_ID]; w++)
+			{
+				for (int c = 0; c < fm_in->shape[C_ID]; c++)
+				{
+					int index = n*feat_size*C_bottom + (h*fm_in->shape[W_ID] + w)*C_bottom + c;
+					printf("%d, ", buffer_in[index]);
+				}
+				printf("\n");
+			}
+		}
+	}
 
 	//以NCHW形式打印数据
 	for (int n = 0; n < fm_in->shape[N_ID]; n++)
@@ -124,7 +124,6 @@ void Printf_NHWC(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in)
 			}
 		}
 	}
-
 }
 
 
@@ -164,11 +163,10 @@ HKA_STATUS HCNN_Filter_Sample_Check(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm_in, H
 			return HKA_STS_ERR;
 		}
 	}
-
-	Printf_NHWC(fm_out);
+	return HKA_STS_OK;
+	//Printf_NHWC(fm_out);
 
 }
-
 
 /**********************************************************************************************************************
 * 功  能：C版本实现 filter sample
@@ -202,9 +200,7 @@ HKA_STATUS HCNN_Filter_Sample_Test_C_NHWC(HCNN_VP6_FILTER_SAMPLE_LAYER_IN_T  *fm
 
 		buffer_out[top_index] = buffer_in[bottom_index];                                                  //上采样                                   
 	}
-
 	Printf_NHWC(fm_out);
-
 }
 
 
@@ -390,13 +386,13 @@ void main()
 	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T fm_out;
 	HCNN_VP6_FILTER_SAMPLE_LAYER_OUT_T *param_out = NULL;
 
-	fm_in.shape[0] = 1;
+	fm_in.shape[0] = 2;
 	fm_in.shape[1] = 5;
 	fm_in.shape[2] = 10;
 	fm_in.shape[3] = 10;
 
 
-	fm_out.shape[0] = 1;
+	fm_out.shape[0] = 2;
 	fm_out.shape[1] = 25;
 	fm_out.shape[2] = 10;
 	fm_out.shape[3] = 10;
