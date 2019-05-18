@@ -1,4 +1,4 @@
-﻿#include<iostream>
+#include<iostream>
 using namespace std;
 //稳定：如果a原本在b前面，而a = b，排序之后a仍然在b的前面。
 //
